@@ -1,4 +1,4 @@
-import Header from "../components/Header";
+import Header from "../../components/Header";
 import UserInfo from "./components/UserInfo";
 import { useNavigate } from "react-router-dom";
 
