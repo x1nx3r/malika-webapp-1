@@ -31,7 +31,7 @@ Malika Web App adalah aplikasi web yang menggunakan Firebase untuk autentikasi p
 2. **Instal dependensi:**
 
    ```bash
-   npm install
+   pnpm install
    ```
 
 3. **Konfigurasi Environment Variables:**
@@ -46,7 +46,7 @@ Malika Web App adalah aplikasi web yang menggunakan Firebase untuk autentikasi p
 4. **Jalankan aplikasi:**
 
    ```bash
-   npm run dev
+   vercel dev
    ```
 
    Aplikasi akan berjalan di `http://localhost:3000`.
