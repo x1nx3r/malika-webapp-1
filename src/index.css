@@ -1,0 +1,121 @@
+@import url("https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap");
+@import "tailwindcss";
+@import "@fontsource/iosevka";
+
+@theme {
+    --font-display: "Roboto", "serif";
+    --color-macchiato-crust: #181926;
+    --color-macchiato-mantle: #1e2030;
+    --color-macchiato-base: #24273a;
+    --color-macchiato-surface0: #363a4f;
+    --color-macchiato-surface1: #494d64;
+    --color-macchiato-surface2: #5b6078;
+    --color-macchiato-overlay0: #6e738d;
+    --color-macchiato-overlay1: #8087a2;
+    --color-macchiato-overlay2: #939ab7;
+    --color-macchiato-subtext0: #a5adcb;
+    --color-macchiato-subtext1: #b8c0e0;
+    --color-macchiato-text: #cad3f5;
+    --color-lavender: #b7bdf8;
+    --color-blue: #8aadf4;
+    --color-sapphire: #7dc4e4;
+    --color-sky: #91d7e3;
+    --color-teal: #8bd5ca;
+    --color-green: #a6da95;
+    --color-yellow: #eed49f;
+    --color-peach: #f5a97f;
+    --color-maroon: #ee99a0;
+    --color-red: #ed8796;
+    --color-mauve: #c6a0f6;
+    --color-pink: #f5bde6;
+    --color-flamingo: #f0c6c6;
+    --color-rosewater: #f4dbd6;
+}
+
+body {
+    font-family: "EB Garamond", serif;
+}
+
+/* Markdown styles */
+.markdown-body {
+    @apply text-macchiato-text bg-macchiato-mantle font-serif leading-relaxed p-5 rounded-sm;
+    font-family: "EB Garamond", serif;
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+    @apply text-macchiato-text mt-3 mb-6;
+    font-family: "EB Garamond", serif;
+}
+
+.markdown-body h1 {
+    @apply text-4xl;
+}
+
+.markdown-body h2 {
+    @apply text-3xl;
+}
+
+.markdown-body h3 {
+    @apply text-2xl;
+}
+
+.markdown-body h4 {
+    @apply text-xl;
+}
+
+.markdown-body h5 {
+    @apply text-lg;
+}
+
+.markdown-body h6 {
+    @apply text-base text-macchiato-subtext0;
+}
+
+.markdown-body p {
+    @apply mb-4 mt-2 text-macchiato-subtext0;
+    font-family: "EB Garamond", serif;
+}
+
+.markdown-body a {
+    @apply text-blue-500 no-underline;
+    font-family: "EB Garamond", serif;
+}
+
+.markdown-body a:hover {
+    @apply underline;
+}
+
+.markdown-body code {
+    @apply font-serif bg-macchiato-mantle text-macchiato-text px-1 py-0.5 rounded;
+    font-family: "EB Garamond", serif;
+}
+
+.markdown-body pre {
+    @apply bg-macchiato-mantle text-macchiato-subtext0 p-4 rounded-lg overflow-x-auto;
+    font-family: "EB Garamond", serif;
+}
+
+.markdown-body blockquote {
+    @apply border-l-4 border-macchiato-crust pl-4 text-macchiato-subtext0 my-4;
+    font-family: "EB Garamond", serif;
+}
+
+.markdown-body ul {
+    @apply list-disc list-inside mx-4 mb-4;
+    font-family: "EB Garamond", serif;
+}
+
+.markdown-body ol {
+    @apply list-decimal list-inside mx-4 mb-4;
+    font-family: "EB Garamond", serif;
+}
+
+.markdown-body li {
+    @apply list-outside mx-4 mb-2;
+    font-family: "EB Garamond", serif;
+}

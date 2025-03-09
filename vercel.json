@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "functions": {
+    "api/auth.js": {
+      "memory": 1024,
+      "maxDuration": 10
+    },
+    "api/testFirebase.js": {
+      "memory": 1024,
+      "maxDuration": 10
+    },
+    "api/logout.js": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  }
+}
