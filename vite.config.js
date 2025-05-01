@@ -28,5 +28,12 @@ export default defineConfig(({ mode }) => {
         VITE_FIREBASE_APP_ID: JSON.stringify(env.VITE_FIREBASE_APP_ID),
       },
     },
+    server: {
+      allowedHosts: [
+        "localhost",
+        "dev.x1nx3r.uk",
+        // Add any other domains you want to allow
+      ],
+    },
   };
 });

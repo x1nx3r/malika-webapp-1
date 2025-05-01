@@ -12,6 +12,7 @@
   "dependencies": {
     "@fontsource/iosevka": "^5.1.0",
     "@fontsource/iosevka-aile": "^5.1.0",
+    "@fontsource/poppins": "^5.2.5",
     "@tailwindcss/vite": "^4.0.7",
     "axios": "^1.7.9",
     "dotenv": "^16.4.7",
