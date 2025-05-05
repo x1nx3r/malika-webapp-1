@@ -51,8 +51,9 @@ export default async function handler(req, res) {
             name: doc.data().name,
             category: doc.data().category,
             price: doc.data().price,
-            kemasan: doc.data().kemasan || "", // Tambahkan default value jika tidak ada
-            description: doc.data().description || "", // Tambahkan default value jika tidak ada
+            kemasan: doc.data().kemasan || "",
+            description: doc.data().description || "",
+            imageUrl: doc.data().imageUrl || "",
             createdAt: doc.data().createdAt.toDate(),
             updatedAt: doc.data().updatedAt.toDate()
         });
@@ -82,8 +83,9 @@ export default async function handler(req, res) {
         name,
         category,
         price: Number(price),
-        kemasan: kemasan || "", // Tambahkan default value jika tidak ada
-        description: description || "", // Tambahkan default value jika tidak ada
+        kemasan: kemasan || "",
+        description: description || "",
+        imageUrl: imageUrl || "",
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
         updatedAt: admin.firestore.FieldValue.serverTimestamp()
       });
@@ -119,8 +121,9 @@ export default async function handler(req, res) {
         ...(name && { name }),
         ...(category && { category }),
         ...(price && { price: Number(price) }),
-        ...(kemasan !== undefined && { kemasan }), // Periksa undefined karena bisa string kosong
-        ...(description !== undefined && { description }), // Periksa undefined karena bisa string kosong
+        ...(kemasan !== undefined && { kemasan }),
+        ...(description !== undefined && { description }),
+        ...(imageUrl !== undefined && { imageUrl }),
         updatedAt: admin.firestore.FieldValue.serverTimestamp()
       };
 

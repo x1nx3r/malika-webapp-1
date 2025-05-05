@@ -13,7 +13,7 @@ export const getMenuData = async (token) => {
       packaging: `Kemasan: ${item.kemasan || "Standard"}`,
       description: item.description || "",
       price: `Rp${item.price.toLocaleString("id-ID")},-`,
-      image: item.image || "https://placehold.co/202x202"
+      image: item.imageUrl || ""
     }));
   } catch (error) {
     console.error("Error fetching menu:", error);
