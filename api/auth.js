@@ -39,7 +39,23 @@ const FIREBASE_API_KEY = process.env.FIREBASE_API_KEY;
 export default async function handler(req, res) {
   // Check if the request method is POST (used for login or registration)
   if (req.method === "POST") {
-    const { email, password, action } = req.body;
+    const { email, password, action, idToken } = req.body;
+
+    if (action === "google") {
+      // Handle Google sign-in
+      try {
+        const decoded = await admin.auth().verifyIdToken(idToken);
+        // Set the ID token as an HTTP-only cookie
+        res.setHeader(
+          "Set-Cookie",
+          `firebaseToken=${idToken}; HttpOnly; Path=/; Max-Age=3600; Secure; SameSite=Lax`,
+        );
+        return res.status(200).json({ message: "Google sign-in successful" });
+      } catch (error) {
+        console.error("Google sign-in error:", error);
+        return res.status(401).json({ error: "Invalid Google token" });
+      }
+    }
 
     if (action === "login") {
       // Handle login
