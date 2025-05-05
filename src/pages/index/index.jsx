@@ -1,26 +1,84 @@
-import Header from "../../components/Header";
-import UserInfo from "./components/UserInfo";
-import { useNavigate } from "react-router-dom";
-
-// The Index component serves as the main container for the home page.
-// It uses Tailwind CSS for styling and applies custom theme colors defined in the global CSS file.
+import { useEffect, useState } from "react";
+import ScaleWrapper from "./components/ui/ScaleWrapper";
+import Navbar from "./components/layout/Navbar";
+import CategoryNav from "./components/layout/CategoryNav";
+import HeroBanner from "./components/home/HeroBanner";
+import ProductSection from "./components/product/ProductSection";
+import Footer from "./components/layout/Footer";
+import { getMenuData } from "../../services/menuService";
+import { auth } from "../../firebase";
 
 function Index() {
-  const navigate = useNavigate(); // Hook to programmatically navigate to different routes
+  const [menuData, setMenuData] = useState({
+    bestSellers: [],
+    porsian: [],
+    family: [],
+    hampers: [],
+    frozenFood: []
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchMenuData = async () => {
+      try {
+        const user = auth.currentUser; // Sekarang auth terdefinisi
+        if (!user) {
+          console.log("No user logged in");
+          return;
+        }
+        
+        const token = await user.getIdToken();
+        const data = await getMenuData(token);
+        
+        const categorizedData = {
+          bestSellers: data.slice(0, 4),
+          porsian: data.filter(item => item.category === "Paket Porsian"),
+          family: data.filter(item => item.category === "Paket Family"),
+          hampers: data.filter(item => item.category === "Paket Hampers"),
+          frozenFood: data.filter(item => item.category === "Frozen Food & Sambal")
+        };
+        
+        setMenuData(categorizedData);
+      } catch (error) {
+        console.error("Error fetching menu data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMenuData();
+  }, []);
+
+  if (loading) {
+    return <div>Loading menu...</div>;
+  }
 
   return (
-    // Main container with flexbox layout to center content both vertically and horizontally
-    <div className="flex flex-col items-center justify-center min-h-screen bg-macchiato-base">
-      {/* Inner container with a fixed width, margin, padding, and background color */}
-      <div className="flex flex-col min-w-4xl max-w-4xl items-center m-5 p-5 rounded-sm bg-macchiato-crust">
-        {/* Header component */}
-        <Header />
-        {/* UserInfo component to display user information */}
-        <UserInfo />
-        {/* Additional container for any extra content or elements */}
-        <div className="text-xl max-w-4xl min-w-3xl w-full flex flex-row justify-between items-start"></div>
+    <ScaleWrapper scale={0.7}>
+      <div className="w-full min-h-screen flex flex-col bg-white shadow-md overflow-x-hidden">
+        <div className="flex-grow">
+          <Navbar />
+          <CategoryNav />
+          <HeroBanner />
+
+          <ProductSection title="Menu Terlaris" products={menuData.bestSellers} />
+
+          <ProductSection title="Paket Porsian" products={menuData.porsian} />
+
+          <ProductSection title="Paket Family" products={menuData.family} />
+
+          <ProductSection title="Paket Hampers" products={menuData.hampers} />
+
+          <ProductSection
+            title="Frozen Food & Sambal"
+            isFrozenFood={true}
+            products={menuData.frozenFood}
+          />
+        </div>
+
+        <Footer />
       </div>
-    </div>
+    </ScaleWrapper>
   );
 }
 
