@@ -1,142 +1,208 @@
-// Excerpt from:
 /**
- * This file handles authentication for the web application using Firebase.
- * It supports three main operations:
- * 1. Logging in with email and password (POST request to /login).
- * 2. Registering a new user (POST request to /register).
- * 3. Checking the session to verify if the user is authenticated (GET request).
+ * Vercel Serverless Function for Authentication
  *
- * The Firebase Admin SDK is used to verify ID tokens, and the Firebase Authentication REST API is used to sign in and register users.
- * The ID token is stored as an HTTP-only cookie to maintain the session securely.
+ * Handles authentication operations via a single endpoint with different actions:
+ * - Login with email/password
+ * - Register new users
+ * - Google OAuth authentication
+ * - Session verification
+ * - Logout
  *
- * Environment variables required:
- * - FIREBASE_SERVICE_ACCOUNT_BASE64: Base64-encoded JSON string of the Firebase service account credentials.
- * - FIREBASE_API_KEY: API key for Firebase Authentication.
+ * Usage:
+ * - POST /api/auth with action="login" - Login with email/password
+ * - POST /api/auth with action="register" - Register a new user
+ * - POST /api/auth with action="google" - Complete Google OAuth flow
+ * - POST /api/auth with action="logout" - Logout user
+ * - GET /api/auth - Check authentication status
  */
 
 import axios from "axios";
 import admin from "firebase-admin";
 
-// Decode the Firebase service account JSON string from the environment variable
-// The service account credentials are stored in an environment variable as a base64-encoded string
+// Decode the Firebase service account JSON string
 const serviceAccount = JSON.parse(
   Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT_BASE64, "base64").toString(
     "utf8",
   ),
 );
 
-// Initialize the Firebase Admin SDK only once to avoid re-initialization errors
+// Initialize Firebase Admin SDK only once
 if (!admin.apps.length) {
   admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount), // Use the decoded service account credentials
+    credential: admin.credential.cert(serviceAccount),
   });
 }
 
-// Retrieve the Firebase API key from the environment variables
+// Firebase API key for client-side operations
 const FIREBASE_API_KEY = process.env.FIREBASE_API_KEY;
 
-// Export the handler function to handle incoming HTTP requests
 export default async function handler(req, res) {
-  // Check if the request method is POST (used for login or registration)
+  // Handle POST requests for authentication operations
   if (req.method === "POST") {
     const { email, password, action, idToken } = req.body;
 
+    // LOGOUT operation
+    if (action === "logout") {
+      res.setHeader(
+        "Set-Cookie",
+        "firebaseToken=; HttpOnly; Path=/; Max-Age=0; Secure; SameSite=Lax",
+      );
+      return res
+        .status(200)
+        .json({ success: true, message: "Logged out successfully" });
+    }
+
+    // GOOGLE SIGN-IN operation
     if (action === "google") {
-      // Handle Google sign-in
       try {
+        // Verify the Google ID token
         const decoded = await admin.auth().verifyIdToken(idToken);
-        // Set the ID token as an HTTP-only cookie
+
+        // Set secure HTTP-only cookie
         res.setHeader(
           "Set-Cookie",
           `firebaseToken=${idToken}; HttpOnly; Path=/; Max-Age=3600; Secure; SameSite=Lax`,
         );
-        return res.status(200).json({ message: "Google sign-in successful" });
+
+        return res.status(200).json({
+          success: true,
+          message: "Google sign-in successful",
+          user: {
+            uid: decoded.uid,
+            email: decoded.email,
+            displayName: decoded.name,
+            photoURL: decoded.picture,
+          },
+        });
       } catch (error) {
         console.error("Google sign-in error:", error);
         return res.status(401).json({ error: "Invalid Google token" });
       }
     }
 
+    // LOGIN operation
     if (action === "login") {
-      // Handle login
       try {
         const response = await axios.post(
           `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${FIREBASE_API_KEY}`,
           {
             email,
             password,
-            returnSecureToken: true, // Request a secure token in the response
+            returnSecureToken: true,
           },
         );
+
         const { idToken } = response.data;
-        // Set the ID token as an HTTP-only cookie to maintain the session
+
+        // Set secure HTTP-only cookie
         res.setHeader(
           "Set-Cookie",
           `firebaseToken=${idToken}; HttpOnly; Path=/; Max-Age=3600; Secure; SameSite=Lax`,
         );
-        return res.status(200).json({ message: "Login successful" });
+
+        return res
+          .status(200)
+          .json({ success: true, message: "Login successful" });
       } catch (error) {
-        console.error(
-          "Firebase sign-in error:",
-          error.response?.data || error.message,
-        );
-        return res.status(401).json({ error: "Invalid credentials" });
+        console.error("Login error:", error.response?.data || error.message);
+        return res.status(401).json({
+          error:
+            formatAuthErrorMessage(error.response?.data?.error?.message) ||
+            "Invalid credentials",
+        });
       }
-    } else if (action === "register") {
-      // Handle registration
+    }
+
+    // REGISTER operation
+    else if (action === "register") {
       try {
         const response = await axios.post(
           `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${FIREBASE_API_KEY}`,
           {
             email,
             password,
-            returnSecureToken: true, // Request a secure token in the response
+            returnSecureToken: true,
           },
         );
+
         const { idToken } = response.data;
-        // Set the ID token as an HTTP-only cookie to maintain the session
+
+        // Set secure HTTP-only cookie
         res.setHeader(
           "Set-Cookie",
           `firebaseToken=${idToken}; HttpOnly; Path=/; Max-Age=3600; Secure; SameSite=Lax`,
         );
-        return res.status(200).json({ message: "Registration successful" });
+
+        return res
+          .status(200)
+          .json({ success: true, message: "Registration successful" });
       } catch (error) {
         console.error(
-          "Firebase registration error:",
+          "Registration error:",
           error.response?.data || error.message,
         );
-        return res.status(400).json({ error: "Registration failed" });
+        return res.status(400).json({
+          error:
+            formatAuthErrorMessage(error.response?.data?.error?.message) ||
+            "Registration failed",
+        });
       }
-    } else {
+    }
+
+    // Invalid action
+    else {
       return res.status(400).json({ error: "Invalid action" });
     }
   }
-  // Check if the request method is GET (used for session check)
+
+  // Handle GET requests for session verification
   else if (req.method === "GET") {
-    // Extract the cookie from the request headers
     const cookie = req.headers.cookie || "";
-    // Use a regular expression to find the firebaseToken in the cookie
     const tokenMatch = cookie.match(/firebaseToken=([^;]+)/);
+
     if (!tokenMatch) {
-      // If the token is not found, respond with an unauthorized status
       return res.status(401).json({ isAuthenticated: false });
     }
-    // Extract the ID token from the matched group
+
     const idToken = tokenMatch[1];
+
     try {
-      // Verify the ID token using Firebase Admin SDK
       const decoded = await admin.auth().verifyIdToken(idToken);
-      // Respond with the authenticated status and user information
-      return res.status(200).json({ isAuthenticated: true, user: decoded });
+
+      return res.status(200).json({
+        isAuthenticated: true,
+        user: {
+          uid: decoded.uid,
+          email: decoded.email,
+          displayName: decoded.name || decoded.email.split("@")[0],
+          photoURL: decoded.picture || null,
+        },
+      });
     } catch (error) {
-      // Log the error and respond with an unauthorized status if token verification fails
       console.error("Token verification error:", error);
       return res.status(401).json({ isAuthenticated: false });
     }
   }
-  // If the request method is neither POST nor GET, respond with a method not allowed status
+
+  // Method not allowed
   else {
     res.setHeader("Allow", ["GET", "POST"]);
     return res.status(405).json({ error: "Method not allowed" });
   }
+}
+
+// Helper function to format Firebase authentication errors
+function formatAuthErrorMessage(errorCode) {
+  const errorMessages = {
+    EMAIL_NOT_FOUND: "Email tidak terdaftar",
+    INVALID_PASSWORD: "Password salah",
+    USER_DISABLED: "Akun telah dinonaktifkan",
+    EMAIL_EXISTS: "Email sudah terdaftar",
+    OPERATION_NOT_ALLOWED: "Autentikasi dengan password dinonaktifkan",
+    TOO_MANY_ATTEMPTS_TRY_LATER:
+      "Terlalu banyak percobaan gagal, coba lagi nanti",
+    WEAK_PASSWORD: "Password terlalu lemah (min 6 karakter)",
+  };
+
+  return errorMessages[errorCode] || null;
 }
