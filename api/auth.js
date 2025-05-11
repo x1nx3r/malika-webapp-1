@@ -36,6 +36,10 @@ if (!admin.apps.length) {
 // Firebase API key for client-side operations
 const FIREBASE_API_KEY = process.env.FIREBASE_API_KEY;
 
+// Add these constants at the top of your file
+const DEFAULT_USER_ROLE = "user";
+const DEFAULT_ADDRESS = [];
+
 export default async function handler(req, res) {
   // Handle POST requests for authentication operations
   if (req.method === "POST") {
@@ -55,8 +59,24 @@ export default async function handler(req, res) {
     // GOOGLE SIGN-IN operation
     if (action === "google") {
       try {
-        // Verify the Google ID token
         const decoded = await admin.auth().verifyIdToken(idToken);
+
+        // Store user data in Firestore
+        const userRef = admin.firestore().collection("users").doc(decoded.uid);
+
+        // Check if user already exists
+        const userDoc = await userRef.get();
+
+        if (!userDoc.exists) {
+          // Create new user document if it doesn't exist
+          await userRef.set({
+            id: decoded.uid,
+            email: decoded.email,
+            provider: "google",
+            role: DEFAULT_USER_ROLE,
+            address: DEFAULT_ADDRESS,
+          });
+        }
 
         // Set secure HTTP-only cookie
         res.setHeader(
@@ -108,7 +128,7 @@ export default async function handler(req, res) {
         return res.status(401).json({
           error:
             formatAuthErrorMessage(error.response?.data?.error?.message) ||
-            "Invalid credentials",
+            "Invalid credential",
         });
       }
     }
@@ -125,7 +145,16 @@ export default async function handler(req, res) {
           },
         );
 
-        const { idToken } = response.data;
+        const { idToken, localId } = response.data; // localId is the Firebase UID
+
+        // Store user data in Firestore
+        await admin.firestore().collection("users").doc(localId).set({
+          id: localId,
+          email: email,
+          provider: "email",
+          role: DEFAULT_USER_ROLE,
+          address: DEFAULT_ADDRESS,
+        });
 
         // Set secure HTTP-only cookie
         res.setHeader(
@@ -197,7 +226,7 @@ function formatAuthErrorMessage(errorCode) {
     EMAIL_NOT_FOUND: "Email tidak terdaftar",
     INVALID_PASSWORD: "Password salah",
     USER_DISABLED: "Akun telah dinonaktifkan",
-    EMAIL_EXISTS: "Email sudah terdaftar",
+    EMAIL_EXISTS: "Email sudah terdaftar, coba login dengan Google",
     OPERATION_NOT_ALLOWED: "Autentikasi dengan password dinonaktifkan",
     TOO_MANY_ATTEMPTS_TRY_LATER:
       "Terlalu banyak percobaan gagal, coba lagi nanti",

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { app } from "../../../firebase"; // Keep this import for Google auth
 
-const Auth = () => {
+const AuthIndex = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
@@ -78,7 +78,6 @@ const Auth = () => {
     }
   };
 
-  // Rest of the component remains the same
   return (
     <div className="min-w-lg max-w-lg mx-auto p-8">
       <h2
@@ -127,27 +126,31 @@ const Auth = () => {
         </button>
       </form>
 
-      {/* Rest of the component remains the same */}
-      <div className="my-2 flex items-center">
-        <div className="flex-grow border-t border-gray-300"></div>
-        <span className="mx-4 text-black">Atau Gunakan:</span>
-        <div className="flex-grow border-t border-gray-300"></div>
-      </div>
+      {/* Only show Google sign-in section when isLogin is true */}
+      {isLogin && (
+        <>
+          <div className="my-2 flex items-center">
+            <div className="flex-grow border-t border-gray-300"></div>
+            <span className="mx-4 text-black">Atau Gunakan:</span>
+            <div className="flex-grow border-t border-gray-300"></div>
+          </div>
 
-      <div className="flex items-center justify-center">
-        <button
-          onClick={handleGoogleSignIn}
-          disabled={loading}
-          className="w-2/4 flex items-center justify-center gap-2 bg-white text-gray-800 py-2 rounded-full border border-gray-700 hover:bg-gray-100 transition-all duration-200 ease-in disabled:opacity-50"
-        >
-          <img
-            src="https://www.google.com/favicon.ico"
-            alt="Google logo"
-            className="w-8 h-8"
-          />
-          Masuk Dengan Google
-        </button>
-      </div>
+          <div className="flex items-center justify-center">
+            <button
+              onClick={handleGoogleSignIn}
+              disabled={loading}
+              className="w-2/4 flex items-center justify-center gap-2 bg-white text-gray-800 py-2 rounded-full border border-gray-700 hover:bg-gray-100 transition-all duration-200 ease-in disabled:opacity-50"
+            >
+              <img
+                src="https://www.google.com/favicon.ico"
+                alt="Google logo"
+                className="w-8 h-8"
+              />
+              Masuk Dengan Google
+            </button>
+          </div>
+        </>
+      )}
 
       <div className="mt-6 mb-2 flex items-center">
         <div className="flex-grow border-t border-2 border-orange-400"></div>
@@ -172,4 +175,4 @@ const Auth = () => {
   );
 };
 
-export default Auth;
+export default AuthIndex;
