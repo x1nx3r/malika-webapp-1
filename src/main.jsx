@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { auth } from "./firebase";
 import Index from "./pages/index/index";
-import AuthIndex from "./pages/auth/index";
+import AuthIndex from "./pages/auth/auth";
 import TestPage from "./pages/testpage/index";
 import AboutMe from "./pages/aboutme/aboutme";
 import AdminPenjualan from "./pages/adminPenjualan/adminPenjualan";
@@ -29,19 +29,23 @@ const AppWrapper = () => {
   }, []);
 
   if (loading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Loading...
+      </div>
+    );
   }
 
   return (
     <BrowserRouter>
       <Routes>
-        <Route 
-          path="/" 
-          element={user ? <Index /> : <Navigate to="/auth" replace />} 
+        <Route
+          path="/"
+          element={user ? <Index /> : <Navigate to="/auth" replace />}
         />
-        <Route 
-          path="/auth" 
-          element={user ? <Navigate to="/" replace /> : <AuthIndex />} 
+        <Route
+          path="/auth"
+          element={user ? <Navigate to="/" replace /> : <AuthIndex />}
         />
         <Route path="/dev" element={<TestPage />} />
         <Route path="/about" element={<AboutMe />} />
