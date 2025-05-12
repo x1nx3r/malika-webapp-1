@@ -1,6 +1,6 @@
 import admin from "firebase-admin";
 
-// Initialize Firebase Admin (similar to other APIs)
+// Initialize Firebase Admin
 const serviceAccount = JSON.parse(
   Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT_BASE64, "base64").toString(
     "utf8",
@@ -13,71 +13,91 @@ if (!admin.apps.length) {
   });
 }
 
-// In-memory cart storage (or use Redis in production)
-const carts = new Map();
+const db = admin.firestore();
+const cartsCollection = db.collection("carts");
 
 export default async function handler(req, res) {
-  // Authenticate request
+  console.log("\n--- Cart API Request ---");
+  console.log("Method:", req.method);
+
+  // Add CORS headers
+  res.setHeader("Access-Control-Allow-Credentials", true);
+  res.setHeader("Access-Control-Allow-Origin", "*");
+
+  // Auth check
   const cookie = req.headers.cookie || "";
   const tokenMatch = cookie.match(/firebaseToken=([^;]+)/);
+  const authHeader = req.headers.authorization;
 
-  if (!tokenMatch) {
+  const token = tokenMatch ? tokenMatch[1] : authHeader?.split("Bearer ")[1];
+
+  if (!token) {
+    console.log("No token found in either cookie or auth header");
     return res.status(401).json({ error: "Unauthorized" });
   }
 
   try {
-    const decodedToken = await admin.auth().verifyIdToken(tokenMatch[1]);
+    const decodedToken = await admin.auth().verifyIdToken(token);
     const userId = decodedToken.uid;
+    console.log("Authenticated userId:", userId);
+
+    const cartRef = cartsCollection.doc(userId);
 
     switch (req.method) {
       case "GET":
-        // Get user's cart
-        return res.status(200).json(carts.get(userId) || []);
+        const doc = await cartRef.get();
+        const cartItems = doc.exists ? doc.data().items || [] : [];
+        console.log("Returning cart items:", cartItems);
+        return res.status(200).json(cartItems);
 
       case "POST":
-        // Add/Update cart item
-        const newItem = JSON.parse(req.body);
-        const currentCart = carts.get(userId) || [];
+        console.log("\n--- Processing POST Request ---");
+        let newItem =
+          typeof req.body === "object" ? req.body : JSON.parse(req.body);
+        console.log("New item:", newItem);
 
-        // Check if item exists
-        const existingItemIndex = currentCart.findIndex(
+        const cartDoc = await cartRef.get();
+        let currentItems = cartDoc.exists ? cartDoc.data().items || [] : [];
+
+        const existingItemIndex = currentItems.findIndex(
           (item) => item.id === newItem.id,
         );
 
         if (existingItemIndex >= 0) {
-          // Update quantity
-          currentCart[existingItemIndex].quantity += 1;
+          currentItems[existingItemIndex].quantity += 1;
         } else {
-          // Add new item
-          currentCart.push({ ...newItem, quantity: 1 });
+          currentItems.push({ ...newItem, quantity: 1 });
         }
 
-        carts.set(userId, currentCart);
-        return res.status(200).json(currentCart);
+        await cartRef.set({ items: currentItems }, { merge: true });
+        console.log("Updated cart:", currentItems);
+        return res.status(200).json(currentItems);
 
       case "PUT":
-        // Update item quantity
-        const { id, quantity } = JSON.parse(req.body);
-        const updatedCart = (carts.get(userId) || [])
+        const updateData =
+          typeof req.body === "object" ? req.body : JSON.parse(req.body);
+        const { id, quantity } = updateData;
+
+        const currentDoc = await cartRef.get();
+        let items = currentDoc.exists ? currentDoc.data().items || [] : [];
+
+        items = items
           .map((item) => (item.id === id ? { ...item, quantity } : item))
           .filter((item) => item.quantity > 0);
 
-        carts.set(userId, updatedCart);
-        return res.status(200).json(updatedCart);
+        await cartRef.set({ items }, { merge: true });
+        return res.status(200).json(items);
 
       case "DELETE":
-        // Clear cart or remove item
         const { itemId } = req.query;
         if (itemId) {
-          // Remove specific item
-          const filteredCart = (carts.get(userId) || []).filter(
-            (item) => item.id !== itemId,
-          );
-          carts.set(userId, filteredCart);
-          return res.status(200).json(filteredCart);
+          const doc = await cartRef.get();
+          let items = doc.exists ? doc.data().items || [] : [];
+          items = items.filter((item) => item.id !== itemId);
+          await cartRef.set({ items }, { merge: true });
+          return res.status(200).json(items);
         } else {
-          // Clear entire cart
-          carts.delete(userId);
+          await cartRef.delete();
           return res.status(200).json([]);
         }
 
@@ -89,6 +109,9 @@ export default async function handler(req, res) {
     }
   } catch (error) {
     console.error("Cart operation error:", error);
-    return res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({
+      error: "Internal server error",
+      details: error.message,
+    });
   }
 }

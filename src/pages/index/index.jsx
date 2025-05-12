@@ -17,7 +17,56 @@ function Index() {
     frozenFood: [],
   });
   const [loading, setLoading] = useState(true);
+  const [notification, setNotification] = useState(null);
+  // Track which items are being added to cart
+  const [addingItems, setAddingItems] = useState(new Set());
 
+  // Add to cart handler
+  const handleAddToCart = async (product) => {
+    if (addingItems.has(product.id)) return; // Prevent double-clicks
+
+    try {
+      // Add item to loading state
+      setAddingItems((prev) => new Set([...prev, product.id]));
+
+      const response = await fetch("/api/cart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          kemasan: product.kemasan || "Styrofoam",
+          category: product.category,
+          imageUrl: product.imageUrl,
+          quantity: 1,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to add to cart");
+
+      setNotification({
+        type: "success",
+        message: `${product.name} added to cart`,
+      });
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      setNotification({
+        type: "error",
+        message: "Failed to add item to cart",
+      });
+    } finally {
+      // Remove item from loading state
+      setAddingItems((prev) => {
+        const next = new Set(prev);
+        next.delete(product.id);
+        return next;
+      });
+      setTimeout(() => setNotification(null), 2000);
+    }
+  };
   useEffect(() => {
     const fetchMenuData = async () => {
       try {
@@ -30,26 +79,6 @@ function Index() {
         const token = await user.getIdToken();
         const data = await getMenuData(token);
 
-        // Debug logs
-        console.log("Raw data from API:", data);
-        console.log(
-          "All categories:",
-          data.map((item) => item.category),
-        );
-        console.log("Sample item structure:", data[0]);
-
-        // Log items that should be frozen food
-        const frozenItems = data.filter(
-          (item) => item.category === "Frozen Food & Sambal",
-        );
-        console.log("Found frozen items:", frozenItems);
-
-        // Check for items containing "Frozen" in their category
-        const anyFrozenItems = data.filter(
-          (item) => item.category && item.category.includes("Frozen"),
-        );
-        console.log("Items with 'Frozen' in category:", anyFrozenItems);
-
         const categorizedData = {
           bestSellers: data.slice(0, 4),
           porsian: data.filter((item) => item.category === "Paket Porsian"),
@@ -59,20 +88,6 @@ function Index() {
             (item) => item.category === "Frozen Food & Sambal",
           ),
         };
-
-        // Log the categorized results
-        console.log("Categorized data:", {
-          bestSellers: categorizedData.bestSellers.length,
-          porsian: categorizedData.porsian.length,
-          family: categorizedData.family.length,
-          hampers: categorizedData.hampers.length,
-          frozenFood: categorizedData.frozenFood.length,
-        });
-
-        console.log(
-          "Items in frozen food category:",
-          categorizedData.frozenFood,
-        );
 
         setMenuData(categorizedData);
       } catch (error) {
@@ -106,21 +121,50 @@ function Index() {
           <ProductSection
             title="Menu Terlaris"
             products={menuData.bestSellers}
+            onAddToCart={handleAddToCart}
+            addingItems={addingItems} // Pass loading state
           />
 
-          <ProductSection title="Paket Porsian" products={menuData.porsian} />
+          <ProductSection
+            title="Paket Porsian"
+            products={menuData.porsian}
+            onAddToCart={handleAddToCart}
+            addingItems={addingItems}
+          />
 
-          <ProductSection title="Paket Family" products={menuData.family} />
+          <ProductSection
+            title="Paket Family"
+            products={menuData.family}
+            onAddToCart={handleAddToCart}
+            addingItems={addingItems}
+          />
 
-          <ProductSection title="Paket Hampers" products={menuData.hampers} />
+          <ProductSection
+            title="Paket Hampers"
+            products={menuData.hampers}
+            onAddToCart={handleAddToCart}
+            addingItems={addingItems}
+          />
 
           <ProductSection
             title="Frozen Food & Sambal"
             products={menuData.frozenFood}
+            onAddToCart={handleAddToCart}
+            addingItems={addingItems}
           />
         </div>
 
         <Footer />
+
+        {notification && (
+          <div
+            className={`fixed bottom-4 right-4 px-6 py-3 rounded-md shadow-lg text-white
+              ${notification.type === "success" ? "bg-green-500" : "bg-red-500"}
+              transition-opacity duration-300`}
+          >
+            {notification.message}
+          </div>
+        )}
       </div>
     </ScaleWrapper>
   );

@@ -9,6 +9,7 @@ import AboutMe from "./pages/aboutme/aboutme";
 import AdminPenjualan from "./pages/adminPenjualan/adminPenjualan";
 import AdminKeuangan from "./pages/adminKeuangan/adminKeuangan";
 import "./index.css";
+import ShoppingCart from "./pages/shoppingCart/shoppingCart";
 
 const AppWrapper = () => {
   const [user, setUser] = useState(null);
@@ -51,6 +52,7 @@ const AppWrapper = () => {
         <Route path="/about" element={<AboutMe />} />
         <Route path="/admin" element={<AdminPenjualan />} />
         <Route path="/admin/keuangan" element={<AdminKeuangan />} />
+        <Route path="/cart" element={<ShoppingCart />} />
         {/* Add more routes as needed */}
       </Routes>
     </BrowserRouter>
