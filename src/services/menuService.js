@@ -2,21 +2,31 @@ import axios from "axios";
 
 export const getMenuData = async (token) => {
   try {
+    // Instead of setting as Authorization header,
+    // we need to set the cookie in the request
     const response = await axios.get("/api/menu", {
+      withCredentials: true, // Important for sending cookies
       headers: {
-        Authorization: `Bearer ${token}` // Gunakan Authorization header
-      }
+        Cookie: `firebaseToken=${token}`, // This matches what the API expects
+      },
     });
-    return response.data.map(item => ({
+
+    return response.data.map((item) => ({
       id: item.id,
-      title: item.name,
-      packaging: `Kemasan: ${item.kemasan || "Standard"}`,
+      name: item.name,
+      category: item.category,
+      price: item.price,
+      kemasan: item.kemasan || "Styrofoam",
       description: item.description || "",
-      price: `Rp${item.price.toLocaleString("id-ID")},-`,
-      image: item.imageUrl || ""
+      imageUrl: item.imageUrl || "",
     }));
   } catch (error) {
     console.error("Error fetching menu:", error);
+    if (error.response?.status === 401) {
+      console.error(
+        "Authentication failed - token might be invalid or expired",
+      );
+    }
     throw error;
   }
 };
