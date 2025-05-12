@@ -1,9 +1,13 @@
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Index from "./pages/index/index";
-import AuthIndex from "./pages/auth/index";
 import { useEffect, useState } from "react";
 import { auth } from "./firebase";
+import Index from "./pages/index/index";
+import AuthIndex from "./pages/auth/index";
+import TestPage from "./pages/testpage/index";
+import AboutMe from "./pages/aboutme/aboutme";
+import AdminPenjualan from "./pages/adminPenjualan/adminPenjualan";
+import AdminKeuangan from "./pages/adminKeuangan/adminKeuangan";
 import "./index.css";
 
 const AppWrapper = () => {
@@ -39,6 +43,11 @@ const AppWrapper = () => {
           path="/auth" 
           element={user ? <Navigate to="/" replace /> : <AuthIndex />} 
         />
+        <Route path="/dev" element={<TestPage />} />
+        <Route path="/about" element={<AboutMe />} />
+        <Route path="/admin" element={<AdminPenjualan />} />
+        <Route path="/admin/keuangan" element={<AdminKeuangan />} />
+        {/* Add more routes as needed */}
       </Routes>
     </BrowserRouter>
   );
