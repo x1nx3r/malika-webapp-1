@@ -10,6 +10,7 @@ import AdminPenjualan from "./pages/adminPenjualan/adminPenjualan";
 import AdminKeuangan from "./pages/adminKeuangan/adminKeuangan";
 import "./index.css";
 import ShoppingCart from "./pages/shoppingCart/shoppingCart";
+import Checkout from "./pages/checkOut/checkOut";
 
 const AppWrapper = () => {
   const [user, setUser] = useState(null);
@@ -53,7 +54,7 @@ const AppWrapper = () => {
         <Route path="/admin" element={<AdminPenjualan />} />
         <Route path="/admin/keuangan" element={<AdminKeuangan />} />
         <Route path="/cart" element={<ShoppingCart />} />
-        {/* Add more routes as needed */}
+        <Route path="/checkout" element={<Checkout />} />
       </Routes>
     </BrowserRouter>
   );
