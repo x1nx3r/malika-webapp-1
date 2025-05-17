@@ -55,6 +55,7 @@ function Navbar() {
                 label="Pembayaran"
                 hasBorder
                 notification
+                onClick={() => navigate("/checkout")}
               />
               <NavItem icon={<MenuIcon />} label="Menu" />
             </div>
