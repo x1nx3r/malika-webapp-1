@@ -17,6 +17,14 @@
       "memory": 1024,
       "maxDuration": 10
     },
+    "api/orders.js": {
+      "memory": 1024,
+      "maxDuration": 10
+    },
+    "api/orders/[orderId].js": {
+      "memory": 1024,
+      "maxDuration": 10
+    },
     "api/menu.js": {
       "memory": 1024,
       "maxDuration": 10

@@ -11,6 +11,7 @@ import AdminKeuangan from "./pages/adminKeuangan/adminKeuangan";
 import "./index.css";
 import ShoppingCart from "./pages/shoppingCart/shoppingCart";
 import Checkout from "./pages/checkOut/checkOut";
+import PaymentPage from "./pages/payment/paymentPage"; // Import the payment page
 
 const AppWrapper = () => {
   const [user, setUser] = useState(null);
@@ -55,6 +56,8 @@ const AppWrapper = () => {
         <Route path="/admin/keuangan" element={<AdminKeuangan />} />
         <Route path="/cart" element={<ShoppingCart />} />
         <Route path="/checkout" element={<Checkout />} />
+        {/* Add the payment route with orderId parameter */}
+        <Route path="/payment/:orderId" element={<PaymentPage />} />
       </Routes>
     </BrowserRouter>
   );
