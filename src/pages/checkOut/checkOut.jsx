@@ -8,7 +8,6 @@ import OrderSummary from "./components/OrderSummary";
 import OrderNotes from "./components/OrderNotes";
 import DeliveryTimeSelector from "./components/DeliveryTimeSelector";
 import PaymentDetails from "./components/PaymentDetails";
-import ErrorMessage from "./components/ErrorMessage";
 
 export default function Checkout() {
   const [cartItems, setCartItems] = useState([]);
@@ -27,7 +26,6 @@ export default function Checkout() {
   });
   const [downPaymentPercent, setDownPaymentPercent] = useState(50);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const navigate = useNavigate();
 
   // Calculate derived values
@@ -56,12 +54,10 @@ export default function Checkout() {
 
         if (!response.ok) throw new Error("Failed to fetch cart");
         const data = await response.json();
-
         if (data.length === 0) {
           navigate("/cart");
           return;
         }
-
         setCartItems(data);
       } catch (error) {
         setError("Failed to load cart items");
@@ -69,7 +65,6 @@ export default function Checkout() {
         setLoading(false);
       }
     };
-
     fetchCartItems();
   }, [navigate]);
 
@@ -80,7 +75,6 @@ export default function Checkout() {
       setError("Please fill in all receiver information");
       return;
     }
-
     if (!selectedDate) {
       setError("Please select a delivery date");
       return;
@@ -97,7 +91,6 @@ export default function Checkout() {
       }
 
       const token = await user.getIdToken();
-
       const orderData = {
         receiverInfo,
         deliveryInfo: {
@@ -146,49 +139,52 @@ export default function Checkout() {
   }
 
   return (
-    <div className="container mx-auto max-w-7xl bg-white shadow-md rounded-lg overflow-hidden">
+    <div className="container mx-auto max-w-5xl bg-white shadow-md rounded-lg">
       <CheckoutHeader onCancel={() => navigate("/cart")} />
 
-      {error && <ErrorMessage message={error} />}
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mx-4 mb-4">
+          {error}
+        </div>
+      )}
 
-      <div className="flex flex-wrap">
+      <div className="flex flex-col lg:flex-row">
         {/* Left Column */}
-        <div className="w-full lg:w-2/3 p-6">
+        <div className="w-full lg:w-3/5 p-4">
           <ReceiverInfoForm
             receiverInfo={receiverInfo}
             setReceiverInfo={setReceiverInfo}
           />
-
           <OrderSummary items={cartItems} />
         </div>
 
         {/* Right Column */}
-        <div className="w-full lg:w-1/3 border-l border-slate-950/30">
-          <OrderNotes notes={orderNotes} onChange={setOrderNotes} />
-
-          <DeliveryTimeSelector
-            selectedDate={selectedDate}
-            setSelectedDate={setSelectedDate}
-            selectedTime={selectedTime}
-            setSelectedTime={setSelectedTime}
-          />
-
-          <PaymentDetails
-            subtotal={subtotal}
-            downPaymentPercent={downPaymentPercent}
-            setDownPaymentPercent={setDownPaymentPercent}
-            downPaymentAmount={downPaymentAmount}
-            remainingPayment={remainingPayment}
-          />
+        <div className="w-full lg:w-2/5 p-4 lg:border-l border-slate-300">
+          <div className="space-y-4">
+            <OrderNotes notes={orderNotes} onChange={setOrderNotes} />
+            <DeliveryTimeSelector
+              selectedDate={selectedDate}
+              setSelectedDate={setSelectedDate}
+              selectedTime={selectedTime}
+              setSelectedTime={setSelectedTime}
+            />
+            <PaymentDetails
+              subtotal={subtotal}
+              downPaymentPercent={downPaymentPercent}
+              setDownPaymentPercent={setDownPaymentPercent}
+              downPaymentAmount={downPaymentAmount}
+              remainingPayment={remainingPayment}
+            />
+          </div>
         </div>
       </div>
 
       {/* Order Button */}
-      <div className="p-6 flex justify-center">
+      <div className="p-4">
         <button
           onClick={handleCreateOrder}
           disabled={isSubmitting}
-          className={`w-full max-w-4xl py-6 rounded-2xl text-white text-4xl font-bold font-poppins
+          className={`w-full py-3 rounded-lg text-white text-xl font-bold
             ${isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-amber-500 hover:bg-amber-600"}`}
         >
           {isSubmitting ? "Processing..." : "Buat Pesanan"}
