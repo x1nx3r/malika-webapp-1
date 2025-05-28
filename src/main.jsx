@@ -8,6 +8,7 @@ import TestPage from "./pages/testpage/index";
 import AboutMe from "./pages/aboutme/aboutme";
 import AdminPenjualan from "./pages/adminPenjualan/adminPenjualan";
 import AdminKeuangan from "./pages/adminKeuangan/adminKeuangan";
+import AdminKelolaMenu from "./pages/adminKelolaMenu/adminKelolaMenu";
 import "./index.css";
 import ShoppingCart from "./pages/shoppingCart/shoppingCart";
 import Checkout from "./pages/checkOut/checkOut";
@@ -116,6 +117,7 @@ const AppWrapper = () => {
         <Route path="/about" element={<AboutMe />} />
         <Route path="/admin" element={<AdminPenjualan />} />
         <Route path="/admin/keuangan" element={<AdminKeuangan />} />
+        <Route path="/admin/kelolamenu" element={<AdminKelolaMenu />} />
         <Route path="/cart" element={<ShoppingCart />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/payment/:orderId" element={<PaymentPage />} />

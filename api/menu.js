@@ -57,7 +57,15 @@ export default async function handler(req, res) {
     if (req.method === "GET") {
       try {
         console.log("Fetching menu items...");
-        const snapshot = await menuCollection.get();
+
+        const showAll = req.query.showAll === "true";
+        let query = menuCollection;
+        
+        if (!showAll) {
+          query = query.where("isArchived", "!=", true);
+        }
+
+        const snapshot = await query.get();
         const menus = [];
 
         snapshot.forEach((doc) => {
@@ -67,11 +75,12 @@ export default async function handler(req, res) {
             name: data.name,
             category: data.category,
             price: data.price,
-            kemasan: data.kemasan || "Styrofoam",
+            kemasan: data.kemasan || "-",
             description: data.description || "",
             imageUrl: data.imageUrl || "",
             createdAt: data.createdAt ? data.createdAt.toDate() : new Date(),
             updatedAt: data.updatedAt ? data.updatedAt.toDate() : new Date(),
+            isArchived: data.isArchived || false,
           });
         });
 
@@ -204,6 +213,45 @@ export default async function handler(req, res) {
         console.error("Error deleting menu:", error);
         return res.status(500).json({
           error: "Failed to delete menu",
+          details: error.message,
+        });
+      }
+    }
+
+    // PATCH - Update status Archive Items
+    else if (req.method === "PATCH") {
+      console.log("Updating archive status...");
+      const { id, isArchived } = req.body;
+
+      if (!id) {
+        return res.status(400).json({ error: "Menu ID is required" });
+      }
+
+      try {
+        const menuRef = menuCollection.doc(id);
+        const doc = await menuRef.get();
+
+        if (!doc.exists) {
+          return res.status(404).json({ error: "Menu not found" });
+        }
+
+        // Pastikan nilai isArchived yang diterima adalah boolean
+        const newArchiveStatus = typeof isArchived === 'boolean' ? isArchived : true;
+        
+        await menuRef.update({
+          isArchived: newArchiveStatus,
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+
+        console.log(`Menu item ${id} archive status updated to ${newArchiveStatus}`);
+        return res.status(200).json({ 
+          message: `Menu ${newArchiveStatus ? 'archived' : 'unarchived'} successfully`,
+          isArchived: newArchiveStatus 
+        });
+      } catch (error) {
+        console.error("Error updating archive status:", error);
+        return res.status(500).json({
+          error: "Failed to update archive status",
           details: error.message,
         });
       }
