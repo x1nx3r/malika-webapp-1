@@ -9,7 +9,8 @@ function FrozenFoodCard({ product, onAddToCart, isLoading }) {
         />
         <div className="w-[3rem] h-[3rem] sm:w-[3.75rem] sm:h-[3.75rem] absolute top-0 right-0 bg-[#028643] shadow-md rounded-bl-[0.375rem] sm:rounded-bl-[0.5rem] flex items-center justify-center">
           <div className="text-center text-white text-lg sm:text-2xl font-semibold font-['Poppins'] leading-[1.25rem] sm:leading-[1.5rem]">
-            {product.kemasan}
+            isi<br/>
+            {product.amount}
           </div>
         </div>
       </div>
@@ -19,17 +20,17 @@ function FrozenFoodCard({ product, onAddToCart, isLoading }) {
           <div className="text-black text-lg sm:text-xl font-semibold font-['Poppins'] leading-tight sm:leading-[1.25rem]">
             {product.name}
           </div>
-          {product.description && (
+          {/* {product.description && (
             <div className="text-gray-600 text-sm mt-2 font-['Poppins']">
               {product.description}
             </div>
-          )}
+          )} */}
         </div>
 
         <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0 mt-4">
           <div className="w-full sm:w-[9.938rem] h-[2.25rem] bg-[#03081F] rounded-[0.375rem] flex items-center justify-center">
             <div className="text-center text-[#F0F0F0] text-base sm:text-lg font-bold font-['Poppins']">
-              Rp{product.price.toLocaleString("id-ID")},-
+              Rp{product.price.toLocaleString("id-ID")}/pax
             </div>
           </div>
 

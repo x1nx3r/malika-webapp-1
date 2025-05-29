@@ -81,6 +81,7 @@ export default async function handler(req, res) {
             createdAt: data.createdAt ? data.createdAt.toDate() : new Date(),
             updatedAt: data.updatedAt ? data.updatedAt.toDate() : new Date(),
             isArchived: data.isArchived || false,
+            amount: data.amount || "-",
           });
         });
 
@@ -98,7 +99,7 @@ export default async function handler(req, res) {
     // POST - Add new menu item
     else if (req.method === "POST") {
       console.log("Creating new menu item...");
-      const { name, category, price, kemasan, description, imageUrl } =
+      const { name, category, price, kemasan, description, amount, imageUrl, isArchived } =
         req.body;
 
       // Validation
@@ -120,9 +121,11 @@ export default async function handler(req, res) {
           name,
           category,
           price: Number(price),
-          kemasan: kemasan || "Styrofoam",
+          kemasan: kemasan || "",
           description: description || "",
+          amount: Number(amount),
           imageUrl: imageUrl || "",
+          isArchived: isArchived || false,
           createdAt: admin.firestore.FieldValue.serverTimestamp(),
           updatedAt: admin.firestore.FieldValue.serverTimestamp(),
         });
@@ -144,7 +147,7 @@ export default async function handler(req, res) {
     // PUT - Update menu item
     else if (req.method === "PUT") {
       console.log("Updating menu item...");
-      const { id, name, category, price, kemasan, description, imageUrl } =
+      const { id, name, category, price, kemasan, description, amount, imageUrl } =
         req.body;
 
       if (!id) {
@@ -173,6 +176,7 @@ export default async function handler(req, res) {
           ...(price && { price: Number(price) }),
           ...(kemasan !== undefined && { kemasan }),
           ...(description !== undefined && { description }),
+          ...(amount !== undefined && { amount }),
           ...(imageUrl !== undefined && { imageUrl }),
           updatedAt: admin.firestore.FieldValue.serverTimestamp(),
         };

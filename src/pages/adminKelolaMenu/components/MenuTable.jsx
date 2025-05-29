@@ -83,16 +83,27 @@ const MenuTable = ({ menus, loading, error, onUpdate, onArchive, onUnarchive }) 
     return <p className="text-center py-4">Tidak ada menu tersedia</p>;
   }
 
+  // Fungsi untuk memotong teks deskripsi
+  const truncateDescription = (text, maxLength = 50) => {
+    if (text.length > maxLength) {
+      return text.substring(0, maxLength) + '...';
+    }
+    return text;
+  };
+
   return (
     <div className="space-y-8">
-      {orderedCategories.map(
-        (category) =>
-          groupedMenus[category] && (
-            <div key={category} className="bg-white rounded-lg shadow overflow-hidden">
-              <h3 className="bg-orange-500 text-white px-4 py-2 font-semibold">
-                {category}
-              </h3>
-              <div className="overflow-x-auto">
+      {orderedCategories.map((category) => {
+        if (!groupedMenus[category]) return null;
+        
+        return (
+          <div key={category} className="bg-white rounded-lg shadow overflow-hidden">
+            <h3 className="bg-orange-500 text-white px-4 py-2 font-semibold">
+              {category}
+            </h3>
+            <div className="overflow-x-auto">
+              {/* Tabel untuk Paket Porsian */}
+              {category === "Paket Porsian" && (
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
@@ -101,6 +112,148 @@ const MenuTable = ({ menus, loading, error, onUpdate, onArchive, onUnarchive }) 
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Kemasan
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Harga
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Aksi
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {groupedMenus[category].map((menu) => (
+                      <tr key={menu.id} className={menu.isArchived ? "bg-gray-100 opacity-80" : ""}>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center">
+                            {menu.imageUrl && (
+                              <div className="flex-shrink-0 h-10 w-10 mr-3">
+                                <img
+                                  className="h-10 w-10 rounded-full object-cover"
+                                  src={menu.imageUrl}
+                                  alt={menu.name}
+                                />
+                              </div>
+                            )}
+                            <div>
+                              <div className={`text-sm font-medium ${menu.isArchived ? "text-gray-500 line-through" : "text-gray-900"}`}>
+                                {menu.name}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                {truncateDescription(menu.description)}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {menu.kemasan}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          Rp{menu.price.toLocaleString("id-ID")}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <button
+                            onClick={() => handleEdit(menu)}
+                            className="text-orange-600 hover:text-orange-900 mr-3"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleArchiveAction(menu)}
+                            className="text-gray-600 hover:text-gray-900"
+                            title={menu.isArchived ? "Tampilkan Menu" : "Arsipkan Menu"}
+                          >
+                            {menu.isArchived ? (
+                              <FaEyeSlash className="text-red-500" />
+                            ) : (
+                              <FaEye className="text-green-500" />
+                            )}
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+
+              {/* Tabel untuk Paket Family dan Paket Hampers */}
+              {(category === "Paket Family" || category === "Paket Hampers") && (
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Nama
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Harga
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Aksi
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {groupedMenus[category].map((menu) => (
+                      <tr key={menu.id} className={menu.isArchived ? "bg-gray-100 opacity-80" : ""}>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center">
+                            {menu.imageUrl && (
+                              <div className="flex-shrink-0 h-10 w-10 mr-3">
+                                <img
+                                  className="h-10 w-10 rounded-full object-cover"
+                                  src={menu.imageUrl}
+                                  alt={menu.name}
+                                />
+                              </div>
+                            )}
+                            <div>
+                              <div className={`text-sm font-medium ${menu.isArchived ? "text-gray-500 line-through" : "text-gray-900"}`}>
+                                {menu.name}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                {truncateDescription(menu.description)}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          Rp{menu.price.toLocaleString("id-ID")}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <button
+                            onClick={() => handleEdit(menu)}
+                            className="text-orange-600 hover:text-orange-900 mr-3"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleArchiveAction(menu)}
+                            className="text-gray-600 hover:text-gray-900"
+                            title={menu.isArchived ? "Tampilkan Menu" : "Arsipkan Menu"}
+                          >
+                            {menu.isArchived ? (
+                              <FaEyeSlash className="text-red-500" />
+                            ) : (
+                              <FaEye className="text-green-500" />
+                            )}
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+
+              {/* Tabel untuk Frozen Food & Sambal */}
+              {category === "Frozen Food & Sambal" && (
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Nama
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Isi
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Harga
@@ -124,49 +277,45 @@ const MenuTable = ({ menus, loading, error, onUpdate, onArchive, onUnarchive }) 
                                 />
                               </div>
                             )}
-                            <div>
-                              <div className={`text-sm font-medium ${menu.isArchived ? "text-gray-500 line-through" : "text-gray-900"}`}>
-                                {menu.name}
-                              </div>
-                              <div className="text-sm text-gray-500">
-                                {menu.description}
-                              </div>
+                            <div className={`text-sm font-medium ${menu.isArchived ? "text-gray-500 line-through" : "text-gray-900"}`}>
+                              {menu.name}
                             </div>
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {menu.kemasan}
+                          {menu.amount}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           Rp{menu.price.toLocaleString("id-ID")}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <button
-                                onClick={() => handleEdit(menu)}
-                                className="text-orange-600 hover:text-orange-900 mr-3"
-                            >
-                                Edit
-                            </button>
-                            <button
-                                onClick={() => handleArchiveAction(menu)}
-                                className="text-gray-600 hover:text-gray-900"
-                                title={menu.isArchived ? "Tampilkan Menu" : "Arsipkan Menu"}
-                            >
-                                {menu.isArchived ? (
-                                <FaEyeSlash className="text-red-500" />
-                                ) : (
-                                <FaEye className="text-green-500" />
-                                )}
-                            </button>
+                          <button
+                            onClick={() => handleEdit(menu)}
+                            className="text-orange-600 hover:text-orange-900 mr-3"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleArchiveAction(menu)}
+                            className="text-gray-600 hover:text-gray-900"
+                            title={menu.isArchived ? "Tampilkan Menu" : "Arsipkan Menu"}
+                          >
+                            {menu.isArchived ? (
+                              <FaEyeSlash className="text-red-500" />
+                            ) : (
+                              <FaEye className="text-green-500" />
+                            )}
+                          </button>
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
-              </div>
+              )}
             </div>
-          )
-      )}
+          </div>
+        );
+      })}
 
       <EditMenuModal
         isOpen={isEditModalOpen}
