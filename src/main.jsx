@@ -1,18 +1,18 @@
-import ReactDOM from "react-dom/client";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useEffect, useState, useRef } from "react";
-import { auth } from "./firebase";
-import Index from "./pages/index/index";
-import AuthIndex from "./pages/auth/auth";
-import TestPage from "./pages/testpage/index";
-import AboutMe from "./pages/aboutme/aboutme";
-import AdminPenjualan from "./pages/adminPenjualan/adminPenjualan";
-import AdminKeuangan from "./pages/adminKeuangan/adminKeuangan";
-import AdminKelolaMenu from "./pages/adminKelolaMenu/adminKelolaMenu";
-import "./index.css";
-import ShoppingCart from "./pages/shoppingCart/shoppingCart";
-import Checkout from "./pages/checkOut/checkOut";
-import PaymentPage from "./pages/payment/paymentPage";
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect, useState, useRef } from 'react';
+import { auth } from './firebase';
+import Index from './pages/index/index';
+import AuthIndex from './pages/auth/auth';
+import TestPage from './pages/testpage/index';
+import AboutMe from './pages/aboutme/aboutme';
+import AdminPenjualan from './pages/adminPenjualan/adminPenjualan';
+import AdminKeuangan from './pages/adminKeuangan/adminKeuangan';
+import AdminKelolaMenu from './pages/adminKelolaMenu/adminKelolaMenu';
+import './index.css';
+import ShoppingCart from './pages/shoppingCart/shoppingCart';
+import Checkout from './pages/checkOut/checkOut';
+import PaymentPage from './pages/payment/paymentPage';
 
 const AppWrapper = () => {
   const [user, setUser] = useState(null);
@@ -24,7 +24,7 @@ const AppWrapper = () => {
   const refreshToken = async () => {
     try {
       if (auth.currentUser) {
-        console.log("Refreshing auth token...");
+        console.log('Refreshing auth token...');
         const token = await auth.currentUser.getIdToken(true); // Force refresh
         document.cookie = `firebaseToken=${token}; path=/; max-age=3600`; // 1 hour
 
@@ -32,7 +32,7 @@ const AppWrapper = () => {
         scheduleTokenRefresh(55 * 60 * 1000); // 55 minutes
       }
     } catch (error) {
-      console.error("Error refreshing token:", error);
+      console.error('Error refreshing token:', error);
       // If refresh fails, try again in 1 minute
       scheduleTokenRefresh(60 * 1000);
     }
@@ -48,7 +48,7 @@ const AppWrapper = () => {
     // Set new timer
     tokenRefreshTimer.current = setTimeout(refreshToken, delay);
     console.log(
-      `Token refresh scheduled in ${Math.round(delay / 60000)} minutes`,
+      `Token refresh scheduled in ${Math.round(delay / 60000)} minutes`
     );
   };
 
@@ -71,7 +71,7 @@ const AppWrapper = () => {
           // Schedule refresh
           scheduleTokenRefresh(timeToRefresh);
         } catch (error) {
-          console.error("Error getting token:", error);
+          console.error('Error getting token:', error);
         }
       } else {
         // Clear the refresh timer if user is logged out
@@ -113,6 +113,7 @@ const AppWrapper = () => {
           path="/auth"
           element={user ? <Navigate to="/" replace /> : <AuthIndex />}
         />
+
         <Route path="/dev" element={<TestPage />} />
         <Route path="/about" element={<AboutMe />} />
         <Route path="/admin" element={<AdminPenjualan />} />
@@ -126,5 +127,5 @@ const AppWrapper = () => {
   );
 };
 
-const root = document.getElementById("root");
+const root = document.getElementById('root');
 ReactDOM.createRoot(root).render(<AppWrapper />);

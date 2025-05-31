@@ -16,7 +16,7 @@ function ProductCard({ product, onAddToCart, isLoading }) {
           </div>
         </div>
         <div className="text-[#0E0E0E] text-lg sm:text-2xl font-bold font-['Poppins'] mt-4 md:mt-0">
-          Rp{product.price.toLocaleString("id-ID")},-
+          Rp{product.price.toLocaleString('id-ID')},-
         </div>
       </div>
 
@@ -32,8 +32,8 @@ function ProductCard({ product, onAddToCart, isLoading }) {
           className={`w-[3rem] h-[3rem] sm:w-[3.75rem] sm:h-[3.75rem] absolute bottom-3 right-3 md:bottom-6 md:right-6
             ${
               isLoading
-                ? "bg-gray-300 cursor-not-allowed"
-                : "bg-white/80 hover:bg-white/90 active:bg-white/100"
+                ? 'bg-gray-300 cursor-not-allowed'
+                : 'bg-white/80 hover:bg-white/90 active:bg-white/100'
             }
             transition-all rounded-tl-[1.25rem] sm:rounded-tl-[1.625rem] rounded-br-[0.5rem] sm:rounded-br-[0.75rem]
             flex items-center justify-center`}

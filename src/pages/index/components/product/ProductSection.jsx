@@ -1,5 +1,5 @@
-import ProductCard from "./ProductCard";
-import FrozenFoodCard from "./FrozenFoodCard";
+import ProductCard from './ProductCard';
+import FrozenFoodCard from './FrozenFoodCard';
 
 function ProductSection({ title, products, onAddToCart, addingItems }) {
   return (
@@ -13,7 +13,7 @@ function ProductSection({ title, products, onAddToCart, addingItems }) {
           {products.map((product) => {
             const isLoading = addingItems.has(product.id);
 
-            if (title === "Frozen Food & Sambal") {
+            if (title === 'Frozen Food & Sambal') {
               return (
                 <FrozenFoodCard
                   key={product.id}
