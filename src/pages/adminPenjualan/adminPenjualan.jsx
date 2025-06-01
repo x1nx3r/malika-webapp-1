@@ -26,8 +26,10 @@ export default function AdminPenjualan() {
   // Status labels for UI display
   const statusLabels = {
     pending: "Butuh Konfirmasi",
-    processing: "Sedang Diproses",
-    shipped: "Dalam Pengiriman",
+    processed: "Sedang Diproses",
+    delivery: "Dalam Pengiriman",
+    arrived: "Sudah Sampai",
+    paid: "Lunas",
     completed: "Pesanan Selesai",
     cancelled: "Dibatalkan"
   };
@@ -35,8 +37,10 @@ export default function AdminPenjualan() {
   // Status colors for UI styling
   const statusColors = {
     pending: "bg-orange-500",
-    processing: "bg-yellow-500",
-    shipped: "bg-blue-500",
+    processed: "bg-yellow-500",
+    delivery: "bg-blue-500",
+    arrived: "bg-green-500",
+    paid: "bg-green-500",
     completed: "bg-green-500",
     cancelled: "bg-red-500"
   };
@@ -119,15 +123,58 @@ export default function AdminPenjualan() {
   const getStatusColor = (status) => statusColors[status] || "bg-gray-500";
 
   // Handle status change function for buttons
-  const handleStatusChange = async (orderId, newStatus) => {
+  const handleStatusChange = async (orderId, newStatus, additionalData = {}) => {
     try {
+      let updateData = {};
+
+      if (newStatus === 'dp_verified') {
+        // Special case for DP verification
+        updateData = {
+          status: 'processed',
+          paymentInfo: {
+            statusDownPayment: 'verified'
+          }
+        };
+      } else if (newStatus === 'update_shipping') {
+        // Special case for shipping cost update
+        updateData = {
+          paymentInfo: {
+            ...additionalData,
+            // Update total juga
+            total: (selectedOrder?.paymentInfo?.subtotal || 0) + (additionalData.shipingCost || 0)
+          }
+        };
+      } else if (newStatus === 'delivery') {
+        updateData = {
+          status: 'delivery'
+        };
+      } else if (newStatus === 'arrived') {
+        updateData = {
+          status: 'arrived'
+        }
+      } else if (newStatus === 'paid') {
+        updateData = {
+          status: 'paid',
+          paymentInfo: {
+            statusRemainingPayment: 'verified'
+          }
+        };
+      } else if (newStatus === 'completed') {
+        updateData = {
+          status: 'completed'
+        };
+      } else {
+        // Normal status change
+        updateData = { status: newStatus };
+      }
+
       const response = await fetch(`/api/orders/${orderId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${await getFirebaseToken()}`
         },
-        body: JSON.stringify({ status: newStatus })
+        body: JSON.stringify(updateData)
       });
 
       if (!response.ok) {
@@ -135,9 +182,40 @@ export default function AdminPenjualan() {
       }
 
       // Update local state
-      setOrders(orders.map(order => 
-        order.id === orderId ? { ...order, status: newStatus } : order
-      ));
+      setOrders(orders.map(order => {
+        if (order.id === orderId) {
+          if (newStatus === 'dp_verified') {
+            return { 
+              ...order, 
+              status: 'processed',
+              paymentInfo: {
+                ...order.paymentInfo,
+                statusDownPayment: 'verified'
+              }
+            };
+          } else if (newStatus === 'update_shipping') {
+            return {
+              ...order,
+              paymentInfo: {
+                ...order.paymentInfo,
+                ...additionalData,
+                total: (order.paymentInfo.subtotal || 0) + (additionalData.shipingCost || 0)
+              }
+            };
+          } else if (newStatus === 'paid') {
+            return {
+              ...order,
+              status: 'paid',
+              paymentInfo: {
+                ...order.paymentInfo,
+                statusRemainingPayment: 'verified'
+              }
+            };
+          }
+          return { ...order, status: newStatus };
+        }
+        return order;
+      }));
     } catch (error) {
       console.error("Error updating order status:", error);
       alert(`Error: ${error.message}`);

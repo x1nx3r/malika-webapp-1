@@ -12,6 +12,7 @@ import AdminKelolaMenu from "./pages/adminKelolaMenu/adminKelolaMenu";
 import "./index.css";
 import ShoppingCart from "./pages/shoppingCart/shoppingCart";
 import Checkout from "./pages/checkOut/checkOut";
+import PaymentRedirect from "./pages/payment/components/paymentRedirect";
 import PaymentPage from "./pages/payment/paymentPage";
 
 const AppWrapper = () => {
@@ -120,6 +121,7 @@ const AppWrapper = () => {
         <Route path="/admin/kelolamenu" element={<AdminKelolaMenu />} />
         <Route path="/cart" element={<ShoppingCart />} />
         <Route path="/checkout" element={<Checkout />} />
+        <Route path="/payment" element={<PaymentRedirect />} />
         <Route path="/payment/:orderId" element={<PaymentPage />} />
       </Routes>
     </BrowserRouter>
