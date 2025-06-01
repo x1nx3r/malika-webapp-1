@@ -43,7 +43,12 @@ export default function OrderSummary({ order, onStatusChange }) {
     if (order.paymentInfo?.proofDownPayment) {
       window.open(order.paymentInfo.proofDownPayment, '_blank');
     } else {
-      alert('Bukti DP belum tersedia');
+      Swal.fire({
+        title: 'Bukti DP Tidak Tersedia',
+        text: 'Belum ada bukti DP yang diunggah untuk pesanan ini.',
+        icon: 'info',
+        confirmButtonText: 'Mengerti'
+      });
     }
   };
 
@@ -52,7 +57,12 @@ export default function OrderSummary({ order, onStatusChange }) {
     if (order.paymentInfo?.proofRemainingPayment) {
       window.open(order.paymentInfo.proofRemainingPayment, '_blank');
     } else {
-      alert('Bukti pelunasan belum tersedia');
+      Swal.fire({
+        title: 'Bukti Pelunasan Tidak Tersedia',
+        text: 'Belum ada bukti pelunasan yang diunggah untuk pesanan ini.',
+        icon: 'info',
+        confirmButtonText: 'Mengerti'
+      });
     }
   };
 
@@ -326,7 +336,12 @@ export default function OrderSummary({ order, onStatusChange }) {
           <div>
             <button
               onClick={confirmDownPayment}
-              className="w-full bg-orange-400 hover:bg-orange-500 text-white py-3 px-4 rounded-md transition duration-200"
+              disabled={order.status !== 'pending'} // Hanya aktif jika status pending
+              className={`w-full ${
+                order.status === 'pending' 
+                  ? 'bg-orange-400 hover:bg-orange-500' 
+                  : 'bg-gray-300 cursor-not-allowed'
+              } text-white py-3 px-4 rounded-md transition duration-200`}
             >
               <div className="text-center">
                 <div className="font-bold">Sudah DP</div>
@@ -344,7 +359,12 @@ export default function OrderSummary({ order, onStatusChange }) {
           <div>
             <button
               onClick={confirmFullPayment}
-              className="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-4 rounded-md transition duration-200"
+              disabled={order.status === 'pending' || order.status === 'completed'}
+              className={`w-full ${
+                (order.status !== 'pending' && order.status !== 'completed')
+                  ? 'bg-green-500 hover:bg-green-600'
+                  : 'bg-gray-300 cursor-not-allowed'
+              } text-white py-3 px-4 rounded-md transition duration-200`}
             >
               <div className="text-center">
                 <div className="font-bold">Lunas</div>
@@ -358,7 +378,12 @@ export default function OrderSummary({ order, onStatusChange }) {
             </button>
             <button
               onClick={openRemainingProof}
-              className="w-full bg-gray-100 hover:bg-gray-200 text-gray-600 py-2 px-4 rounded-md transition duration-200 text-sm mt-1"
+              disabled={order.status === 'pending'}
+              className={`w-full ${
+                order.status !== 'pending'
+                  ? 'bg-gray-100 hover:bg-gray-200'
+                  : 'bg-gray-300 cursor-not-allowed'
+              } text-gray-600 py-2 px-4 rounded-md transition duration-200 text-sm mt-1`}
             >
               Lihat Bukti Pelunasan
             </button>
@@ -367,28 +392,43 @@ export default function OrderSummary({ order, onStatusChange }) {
 
         <button
           onClick={() => onStatusChange(order.id, "invoice")}
-          className="w-full bg-orange-400 hover:bg-orange-500 text-white py-3 px-4 rounded-md transition duration-200 font-bold"
+          disabled={order.status === 'pending'} // Nonaktif jika status pending
+          className={`w-full ${
+            order.status !== 'pending'
+              ? 'bg-orange-400 hover:bg-orange-500'
+              : 'bg-gray-300 cursor-not-allowed'
+          } text-white py-3 px-4 rounded-md transition duration-200 font-bold`}
         >
           Kirim Invoice
         </button>
 
-        {order.status === 'arrived' || order.status === 'paid' ? (
+        {order.status === 'completed' ? (
+          <div className="w-full bg-green-400 text-white py-3 px-4 rounded-md text-center cursor-not-allowed">
+            Pesanan Selesai
+          </div>
+        ) : order.status === 'arrived' || order.status === 'paid' ? (
           <button
             onClick={confirmCompletion}
-            disabled={order.status !== 'paid' && order.status !== 'arrived'}
-            className={`w-full ${
-              (order.status === 'paid' || order.status === 'arrived') 
-                ? 'bg-green-500 hover:bg-green-600' 
-                : 'bg-gray-100 cursor-not-allowed'
-            } text-white py-3 px-4 rounded-md transition duration-200`}
+            className="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-4 rounded-md transition duration-200"
           >
-            Pesanan Selesai
+            Konfirmasi Pesanan Selesai
+          </button>
+        ) : order.status === 'delivery' ? (
+          <button
+            onClick={confirmArrival}
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-md transition duration-200"
+          >
+            Konfirmasi Pesanan Sampai
           </button>
         ) : (
           <button
             onClick={confirmDelivery}
             disabled={order.status !== 'processed'}
-            className={`w-full ${order.status === 'processed' ? 'bg-gray-200 hover:bg-gray-300' : 'bg-gray-100 cursor-not-allowed'} text-gray-800 py-3 px-4 rounded-md transition duration-200`}
+            className={`w-full ${
+              order.status === 'processed' 
+                ? 'bg-gray-200 hover:bg-gray-300' 
+                : 'bg-gray-100 cursor-not-allowed'
+            } text-gray-800 py-3 px-4 rounded-md transition duration-200`}
           >
             Konfirmasi Pesanan Dikirim
           </button>

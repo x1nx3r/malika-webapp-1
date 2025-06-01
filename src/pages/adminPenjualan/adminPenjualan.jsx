@@ -93,17 +93,15 @@ export default function AdminPenjualan() {
   // Calculate order status counts dynamically
   const [orderStatusCounts, setOrderStatusCounts] = useState({
     pending: 0,
-    processing: 0,
-    shipped: 0,
-    completed: 0,
-    cancelled: 0
+    processed: 0,
+    completed: 0
   });
 
   // Calculate counts when orders are updated
   useEffect(() => {
     const counts = {
       pending: orders.filter(order => order.status === "pending").length,
-      shipped: orders.filter(order => order.status === "shipped").length,
+      processed: orders.filter(order => order.status === "processed").length,
       completed: orders.filter(order => order.status === "completed").length
     };
     setOrderStatusCounts(counts);

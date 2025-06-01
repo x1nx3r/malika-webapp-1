@@ -8,7 +8,7 @@ export default function OrderStats({ counts }) {
         <div className="font-bold text-xl">Butuh Konfirmasi Ongkir</div>
       </div>
       <div className="flex-1 text-center text-white py-6 border-r border-white">
-        <div className="text-5xl font-light">{counts.shipped || 0}</div>
+        <div className="text-5xl font-light">{counts.processed || 0}</div>
         <div className="font-bold text-xl">Pesanan Harus Dikirim</div>
       </div>
       <div className="flex-1 text-center text-white py-6">
@@ -22,7 +22,7 @@ export default function OrderStats({ counts }) {
 OrderStats.propTypes = {
   counts: PropTypes.shape({
     pending: PropTypes.number.isRequired,
-    shipped: PropTypes.number.isRequired,
+    processed: PropTypes.number.isRequired,
     completed: PropTypes.number.isRequired,
   }).isRequired,
 };
