@@ -11,6 +11,7 @@ export default function AdminPenjualan() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [displayedOrders, setDisplayedOrders] = useState([]);
 
   // Today's date
   const today = new Date();
@@ -70,8 +71,14 @@ export default function AdminPenjualan() {
             : 'Tanggal tidak tersedia',
           deliveryTime: order.deliveryInfo?.time || 'Waktu tidak tersedia'
         }));
+
+        // Filter orders untuk ditampilkan (exclude cancelled dan completed)
+        const displayedOrders = transformedOrders.filter(
+          order => order.status !== 'cancelled' && order.status !== 'completed'
+        );
         
         setOrders(transformedOrders);
+        setDisplayedOrders(displayedOrders);
       } catch (err) {
         console.error("Error fetching orders:", err);
         setError(err.message);
@@ -102,6 +109,8 @@ export default function AdminPenjualan() {
     const counts = {
       pending: orders.filter(order => order.status === "pending").length,
       processed: orders.filter(order => order.status === "processed").length,
+      arrived: orders.filter(order => order.status === "arrived").length,
+      paid: orders.filter(order => order.status === "paid").length,
       completed: orders.filter(order => order.status === "completed").length
     };
     setOrderStatusCounts(counts);
@@ -110,11 +119,11 @@ export default function AdminPenjualan() {
   // Selected order state
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const selectedOrder = useMemo(() => {
-    if (!selectedOrderId && orders.length > 0) {
-      return orders[0];
+    if (!selectedOrderId && displayedOrders.length > 0) {
+      return displayedOrders[0];
     }
-    return orders.find(order => order.id === selectedOrderId) || null;
-  }, [selectedOrderId, orders]);
+    return displayedOrders.find(order => order.id === selectedOrderId) || null;
+  }, [selectedOrderId, displayedOrders]);
 
   // Get status label and color for the selected order
   const getStatusLabel = (status) => statusLabels[status] || "";
@@ -262,7 +271,7 @@ export default function AdminPenjualan() {
       <section className="px-6 mt-8">
         <h2 className="text-3xl font-semibold mb-4">Pesanan Hari Ini:</h2>
 
-        <div className="flex bg-orange-500 rounded-lg overflow-hidden mb-8">
+        <div className="flex bg-orange-500 rounded-2xl drop-shadow overflow-hidden mb-8">
           <DateDisplay day={day} date={date} />
           <OrderStats counts={orderStatusCounts} />
         </div>
@@ -270,7 +279,7 @@ export default function AdminPenjualan() {
         <div className="flex gap-6 flex-wrap">
           <div className="flex-1">
             <OrderList
-              orders={orders}
+              orders={displayedOrders}
               selectedOrderId={selectedOrder?.id}
               onSelectOrder={setSelectedOrderId}
               statusLabels={statusLabels}

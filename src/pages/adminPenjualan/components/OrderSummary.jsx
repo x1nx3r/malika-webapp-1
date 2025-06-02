@@ -228,6 +228,38 @@ export default function OrderSummary({ order, onStatusChange }) {
     }
   };
 
+  // Function to cancel order
+  const cancelOrder = async () => {
+    const result = await Swal.fire({
+      title: 'Batalkan Pesanan?',
+      text: 'Apakah Anda yakin ingin membatalkan pesanan ini?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Ya, Batalkan',
+      cancelButtonText: 'Tidak'
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await onStatusChange(order.id, 'cancelled');
+        Swal.fire(
+          'Dibatalkan!',
+          'Pesanan telah berhasil dibatalkan.',
+          'success'
+        );
+      } catch (error) {
+        console.error('Error cancelling order:', error);
+        Swal.fire(
+          'Gagal!',
+          `Terjadi kesalahan: ${error.message}`,
+          'error'
+        );
+      }
+    }
+  };
+
   return (
     <div className="w-96 bg-white rounded-xl border border-gray-200 shadow-md h-fit">
       {/* Customer Header */}
@@ -257,7 +289,7 @@ export default function OrderSummary({ order, onStatusChange }) {
                   )}
                 </div>
               </div>
-              <button className="text-gray-500 hover:text-gray-700">
+              {/* <button className="text-gray-500 hover:text-gray-700">
                 <svg
                   className="h-5 w-5"
                   viewBox="0 0 20 20"
@@ -269,7 +301,7 @@ export default function OrderSummary({ order, onStatusChange }) {
                     clipRule="evenodd"
                   />
                 </svg>
-              </button>
+              </button> */}
             </div>
           </div>
         ))}
@@ -390,18 +422,6 @@ export default function OrderSummary({ order, onStatusChange }) {
           </div>
         </div>
 
-        <button
-          onClick={() => onStatusChange(order.id, "invoice")}
-          disabled={order.status === 'pending'} // Nonaktif jika status pending
-          className={`w-full ${
-            order.status !== 'pending'
-              ? 'bg-orange-400 hover:bg-orange-500'
-              : 'bg-gray-300 cursor-not-allowed'
-          } text-white py-3 px-4 rounded-md transition duration-200 font-bold`}
-        >
-          Kirim Invoice
-        </button>
-
         {order.status === 'completed' ? (
           <div className="w-full bg-green-400 text-white py-3 px-4 rounded-md text-center cursor-not-allowed">
             Pesanan Selesai
@@ -433,6 +453,18 @@ export default function OrderSummary({ order, onStatusChange }) {
             Konfirmasi Pesanan Dikirim
           </button>
         )}
+
+        <button
+          onClick={cancelOrder}
+          disabled={order.status !== 'pending'}
+          className={`w-full ${
+            order.status === 'pending'
+              ? 'bg-red-500 hover:bg-red-600'
+              : 'bg-gray-300 cursor-not-allowed'
+          } text-white py-3 px-4 rounded-md transition duration-200 font-bold`}
+        >
+          Batalkan Pesanan
+        </button>
       </div>
     </div>
   );
