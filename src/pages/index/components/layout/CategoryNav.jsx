@@ -21,9 +21,12 @@ function CategoryButton({ name, isActive, onClick }) {
   );
 }
 
-function CategoryNav({ onCategoryClick, activeCategory: externalActiveCategory }) {
+function CategoryNav({
+  onCategoryClick,
+  activeCategory: externalActiveCategory,
+}) {
   const [localActiveCategory, setLocalActiveCategory] = useState('Rekomendasi');
-  
+
   // Sync local state with external state if provided
   useEffect(() => {
     if (externalActiveCategory) {
@@ -68,7 +71,7 @@ function CategoryNav({ onCategoryClick, activeCategory: externalActiveCategory }
           background: #f1f1f1;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #FC8A06;
+          background: #fc8a06;
           border-radius: 10px;
         }
       `}</style>

@@ -1,49 +1,68 @@
-function HeroBanner() {
-  return (
-    <section className="w-full px-4 sm:px-6 lg:px-8 my-3 sm:my-6">
-      <div className="container mx-auto relative rounded-lg sm:rounded-[1.25rem] overflow-hidden">
-        <img
-          className="w-full h-[12rem] sm:h-[18rem] md:h-[24rem] lg:h-[28.125rem] object-cover rounded-lg sm:rounded-[1.25rem]"
-          src="https://placehold.co/1640x450"
-          alt="Banner"
-        />
-        <div className="absolute inset-0 bg-[rgba(3,8,31,0.86)] rounded-lg sm:rounded-[1.25rem] flex flex-col md:flex-row justify-between p-4 sm:p-8 lg:p-14">
-          {/* Left Content */}
-          <div className="flex flex-col justify-between mb-6 md:mb-0">
-            {/* Upper Content */}
-            <div>
-              <div className="w-auto sm:w-[8.69rem] h-auto sm:h-[2.125rem] mb-2 sm:mb-4 flex justify-center items-center text-white text-sm sm:text-base md:text-xl font-medium font-['Poppins'] px-3 py-1 border border-white/50 rounded-full">
-                100% Otentik
-              </div>
-              <div className="max-w-lg">
-                <span className="text-white text-2xl sm:text-4xl md:text-[3.375rem] font-semibold font-['Poppins'] leading-tight sm:leading-[3.5rem] block mb-1 md:mb-0">
-                  Lodho Ayam Kampung
-                  <br className="hidden sm:block" />
-                  Kedai Malika
-                </span>
-                <span className="text-white text-lg sm:text-xl md:text-[1.75rem] font-semibold font-['Poppins'] leading-tight sm:leading-[2.25rem]">
-                  khas Trenggalek
-                </span>
-              </div>
-            </div>
+import { useNavigate } from 'react-router-dom';
 
-            {/* Contact Buttons - Stack on mobile, side by side on larger screens */}
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 mt-6 md:mt-0">
-              <ContactButton icon={<PhoneIcon />} text="082257374357" />
-              <ContactButton icon={<MapIcon />} text="Google Maps" />
-            </div>
+function HeroBanner() {
+  const navigate = useNavigate();
+
+  return (
+    <section className="relative w-full">
+      <div className="container mx-auto px-4 py-6">
+        <div className="relative rounded-lg overflow-hidden shadow-lg">
+          {/* Background image with overlay */}
+          <div className="relative">
+            <img
+              className="w-full h-[12rem] sm:h-[18rem] md:h-[24rem] object-cover"
+              src="https://gevannoyoh.com/thumb-malika/thumb-hero.webp"
+              alt="Lodho Ayam Kampung"
+            />
+            <div className="absolute inset-0 bg-black bg-opacity-60"></div>
           </div>
 
-          {/* Right Content - Hidden on small mobile, visible from sm up */}
-          <div className="hidden sm:block relative">
-            <img
-              className="w-[18rem] h-[12rem] md:w-[30rem] md:h-[17rem] lg:w-[37.8125rem] lg:h-[21.25rem] rounded-[0.5rem] md:rounded-[0.75rem] object-cover"
-              src="https://placehold.co/605x340"
-              alt="Product"
-            />
+          {/* Content */}
+          <div className="absolute inset-0 flex flex-col md:flex-row items-center justify-between p-4 sm:p-8">
+            {/* Text content */}
+            <div className="text-white max-w-xl">
+              <div className="inline-block px-4 py-1 bg-orange-500 rounded-full mb-4">
+                <span className="font-medium">100% Otentik</span>
+              </div>
 
-            {/* Rating Box */}
-            <RatingBox rating={5.0} />
+              <h1 className="text-2xl sm:text-4xl font-bold mb-2">
+                Lodho Ayam Kampung
+                <br />
+                Kedai Malika
+              </h1>
+              <p className="text-lg mb-6">khas Trenggalek</p>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <a
+                  href="tel:082257374357"
+                  className="flex items-center gap-2 px-4 py-2 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 transition-all"
+                >
+                  <PhoneIcon />
+                  <span className="font-medium">082257374357</span>
+                </a>
+                <a
+                  href="https://maps.google.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-4 py-2 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 transition-all"
+                >
+                  <MapIcon />
+                  <span className="font-medium">Google Maps</span>
+                </a>
+              </div>
+            </div>
+
+            {/* Rating box */}
+            <div className="bg-white rounded-lg p-4 shadow-lg mt-4 md:mt-0">
+              <div className="text-4xl font-bold text-center">5.0</div>
+              <div className="flex justify-center text-yellow-400 mt-2">
+                <StarIcon />
+                <StarIcon />
+                <StarIcon />
+                <StarIcon />
+                <StarIcon />
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -51,49 +70,54 @@ function HeroBanner() {
   );
 }
 
-function ContactButton({ icon, text }) {
-  return (
-    <div className="w-full sm:w-[18.5rem] h-[3rem] sm:h-[3.75rem] flex items-center rounded-full outline outline-1 outline-[#F0F0F0] -outline-offset-1 px-4">
-      <div className="w-[1.75rem] sm:w-[2.25rem] h-[1.75rem] sm:h-[2.25rem] mr-2 sm:mr-4 flex items-center justify-center">
-        {icon}
-      </div>
-      <div className="text-white text-base sm:text-xl md:text-2xl font-semibold font-['Poppins']">
-        {text}
-      </div>
-    </div>
-  );
-}
-
 function PhoneIcon() {
   return (
-    <div className="w-[1.4rem] sm:w-[1.805rem] h-[1.4rem] sm:h-[1.8rem] bg-[#F0F0F0]"></div>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+    </svg>
   );
 }
 
 function MapIcon() {
   return (
-    <div className="w-[1.4rem] sm:w-[1.584rem] h-[1.4rem] sm:h-[1.584rem] bg-[#F0F0F0]"></div>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+      <circle cx="12" cy="10" r="3" />
+    </svg>
   );
 }
 
-function RatingBox({ rating }) {
+function StarIcon() {
   return (
-    <div className="w-[5rem] h-[5rem] sm:w-[7rem] sm:h-[7rem] md:w-[9.375rem] md:h-[9.375rem] absolute bottom-[-1rem] sm:bottom-[-1.563rem] left-[-0.75rem] sm:left-[-1.25rem] bg-white rounded-[0.75rem] md:rounded-[1rem] flex flex-col items-center justify-center shadow-lg">
-      <div className="text-[#0E0E0E] text-3xl sm:text-5xl md:text-[4.5rem] font-medium font-['Poppins']">
-        {rating.toFixed(1)}
-      </div>
-      <div className="flex mt-1 sm:mt-2">
-        {[...Array(5)].map((_, index) => (
-          <div
-            key={index}
-            className="w-[1rem] h-[1rem] sm:w-[1.5rem] sm:h-[1.5rem] relative"
-          >
-            <div className="w-[0.75rem] sm:w-[1.07rem] h-[0.75rem] sm:h-[1.02rem] absolute left-[0.125rem] sm:left-[0.215rem] top-[0.125rem] sm:top-[0.188rem] bg-[#FBBC04]"></div>
-            <div className="w-[0.75rem] sm:w-[1.07rem] h-[0.75rem] sm:h-[1.02rem] absolute left-[0.125rem] sm:left-[0.215rem] top-[0.125rem] sm:top-[0.188rem] outline outline-2 outline-[#FBBC04] -outline-offset-1"></div>
-          </div>
-        ))}
-      </div>
-    </div>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+    >
+      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+    </svg>
   );
 }
 
