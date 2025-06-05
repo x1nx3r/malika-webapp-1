@@ -408,7 +408,7 @@ const MenuTable = ({
   return (
     <div className="space-y-6">
       {/* Enhanced Control Panel */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-6 bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl border border-orange-200 shadow-sm">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-6 bg-gradient-to-r from-orange-50 to-amber-50 rounded-3xl border border-orange-200 shadow-sm">
         <div className="flex flex-wrap gap-4 text-sm">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
@@ -431,7 +431,7 @@ const MenuTable = ({
         </div>
         <button
           onClick={toggleAllCategories}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-medium border border-orange-300 bg-white rounded-lg hover:bg-orange-50 transition-all duration-200 shadow-sm hover:shadow-md"
+          className="flex items-center gap-2 px-4 py-2 text-sm font-medium border border-orange-300 bg-white rounded-xl hover:bg-orange-50 transition-all duration-200 shadow-sm hover:shadow-md"
         >
           {Object.values(expandedCategories).every((expanded) => expanded) ? (
             <>
@@ -457,12 +457,12 @@ const MenuTable = ({
         return (
           <div
             key={category}
-            className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow duration-300"
+            className="bg-white rounded-3xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300"
           >
             {/* Enhanced Category Header */}
             <button
               onClick={() => toggleCategory(category)}
-              className="w-full px-6 py-5 bg-gradient-to-r from-orange-500 to-orange-600 text-white flex items-center justify-between hover:from-orange-600 hover:to-orange-700 transition-all duration-200"
+              className="w-full px-6 py-5 bg-orange-500 text-white flex items-center justify-between hover:bg-orange-600 transition-all duration-250 ease-in"
             >
               <div className="flex items-center gap-4">
                 <h3 className="font-bold text-lg">{category}</h3>
