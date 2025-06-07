@@ -8,6 +8,7 @@ import { getMenuData } from '../../services/menuService';
 import { auth } from '../../firebase';
 
 function Index() {
+  // State management
   const [menuData, setMenuData] = useState({
     bestSellers: [],
     porsian: [],
@@ -24,20 +25,25 @@ function Index() {
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
 
-  // Add to cart handler
+  // Category mapping for smooth scrolling
+  const categoryScrollMap = {
+    Rekomendasi: 'rekomendasi',
+    'Paket Porsian': 'paket-porsian',
+    'Paket Family': 'paket-family',
+    'Paket Hampers': 'paket-hampers',
+    'Frozen Food & Sambal': 'frozen-food',
+  };
+
+  // Add to cart functionality
   const handleAddToCart = async (product) => {
-    if (addingItems.has(product.id)) return; // Prevent double-clicks
+    if (addingItems.has(product.id)) return;
 
     try {
-      // Add item to loading state
       setAddingItems((prev) => new Set([...prev, product.id]));
 
       const response = await fetch('/api/cart', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          // Don't set Cookie header manually, browser will handle it
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           id: product.id,
           name: product.name,
@@ -47,32 +53,96 @@ function Index() {
           imageUrl: product.imageUrl,
           quantity: 1,
         }),
-        credentials: 'include', // This tells fetch to include cookies
+        credentials: 'include',
       });
 
       if (!response.ok) throw new Error('Failed to add to cart');
 
-      setNotification({
-        type: 'success',
-        message: `${product.name} added to cart`,
-      });
+      showNotification('success', `${product.name} added to cart`);
     } catch (error) {
       console.error('Error adding to cart:', error);
-      setNotification({
-        type: 'error',
-        message: 'Failed to add item to cart',
-      });
+      showNotification('error', 'Failed to add item to cart');
     } finally {
-      // Remove item from loading state
       setAddingItems((prev) => {
         const next = new Set(prev);
         next.delete(product.id);
         return next;
       });
-      setTimeout(() => setNotification(null), 2000);
     }
   };
 
+  // Notification helper
+  const showNotification = (type, message) => {
+    setNotification({ type, message });
+    setTimeout(() => setNotification(null), 2000);
+  };
+
+  // Category click handler with smooth scrolling
+  const handleCategoryClick = (categoryName) => {
+    setActiveCategory(categoryName);
+    clearSearch();
+
+    const sectionId = categoryScrollMap[categoryName];
+    if (sectionId) {
+      scrollToSection(sectionId);
+    }
+  };
+
+  // Search functionality
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+
+    if (!query.trim()) {
+      clearSearch();
+      return;
+    }
+
+    setIsSearching(true);
+    const results = allProducts.filter((product) =>
+      product.name.toLowerCase().includes(query.toLowerCase()) ||
+      (product.description && 
+       product.description.toLowerCase().includes(query.toLowerCase()))
+    );
+    setSearchResults(results);
+  };
+
+  // Clear search state
+  const clearSearch = () => {
+    setIsSearching(false);
+    setSearchQuery('');
+    setSearchResults([]);
+  };
+
+  // Smooth scroll to section
+  const scrollToSection = (sectionId) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      const yOffset = -140; // Reduced from -180 to -140
+      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+  };
+
+  // Get products to display based on search state
+  const getProductsToShow = () => {
+    if (isSearching) {
+      return [{
+        title: `Search Results for "${searchQuery}"`,
+        products: searchResults,
+        id: 'search-results',
+      }];
+    }
+
+    return [
+      { title: 'Rekomendasi', products: menuData.bestSellers, id: 'rekomendasi' },
+      { title: 'Paket Porsian', products: menuData.porsian, id: 'paket-porsian' },
+      { title: 'Paket Family', products: menuData.family, id: 'paket-family' },
+      { title: 'Paket Hampers', products: menuData.hampers, id: 'paket-hampers' },
+      { title: 'Frozen Food & Sambal', products: menuData.frozenFood, id: 'frozen-food' },
+    ];
+  };
+
+  // Fetch menu data on component mount
   useEffect(() => {
     const fetchMenuData = async () => {
       try {
@@ -84,21 +154,15 @@ function Index() {
 
         const token = await user.getIdToken();
         const data = await getMenuData(token);
-
-        // Store all products in a single array for search
+        
         setAllProducts(data);
-
-        const categorizedData = {
+        setMenuData({
           bestSellers: data.slice(0, 4),
           porsian: data.filter((item) => item.category === 'Paket Porsian'),
           family: data.filter((item) => item.category === 'Paket Family'),
           hampers: data.filter((item) => item.category === 'Paket Hampers'),
-          frozenFood: data.filter(
-            (item) => item.category === 'Frozen Food & Sambal'
-          ),
-        };
-
-        setMenuData(categorizedData);
+          frozenFood: data.filter((item) => item.category === 'Frozen Food & Sambal'),
+        });
       } catch (error) {
         console.error('Error fetching menu data:', error);
       } finally {
@@ -109,111 +173,11 @@ function Index() {
     fetchMenuData();
   }, []);
 
-  // Handle category selection
-  const handleCategoryClick = (categoryName) => {
-    setActiveCategory(categoryName);
-    setIsSearching(false); // Clear search when selecting a category
-    setSearchQuery('');
-
-    // Map category names to section IDs
-    const categoryToId = {
-      Rekomendasi: 'rekomendasi',
-      'Paket Porsian': 'paket-porsian',
-      'Paket Family': 'paket-family',
-      'Paket Hampers': 'paket-hampers',
-      'Frozen Food & Sambal': 'frozen-food',
-    };
-
-    const sectionId = categoryToId[categoryName];
-    if (sectionId) {
-      const element = document.getElementById(sectionId);
-      if (element) {
-        // Get position with offset for fixed header
-        const yOffset = -180; // Increased offset for better positioning
-        const y =
-          element.getBoundingClientRect().top + window.pageYOffset + yOffset;
-
-        // Scroll with smooth behavior
-        window.scrollTo({
-          top: y,
-          behavior: 'smooth',
-        });
-      }
-    }
-
-    console.log(`Category changed to: ${categoryName}`);
-  };
-
-  // Handle search
-  const handleSearch = (query) => {
-    setSearchQuery(query);
-
-    if (query.trim() === '') {
-      setIsSearching(false);
-      return;
-    }
-
-    setIsSearching(true);
-
-    const lowerCaseQuery = query.toLowerCase();
-    const results = allProducts.filter(
-      (product) =>
-        product.name.toLowerCase().includes(lowerCaseQuery) ||
-        (product.description &&
-          product.description.toLowerCase().includes(lowerCaseQuery))
-    );
-
-    setSearchResults(results);
-  };
-
-  // Add the missing getProductsToShow function
-  const getProductsToShow = () => {
-    if (isSearching) {
-      return [
-        {
-          title: `Search Results for "${searchQuery}"`,
-          products: searchResults,
-          id: 'search-results',
-        },
-      ];
-    }
-
-    // Return ALL categories with their products and unique IDs for scrolling
-    return [
-      {
-        title: 'Rekomendasi',
-        products: menuData.bestSellers || [],
-        id: 'rekomendasi',
-      },
-      {
-        title: 'Paket Porsian',
-        products: menuData.porsian || [],
-        id: 'paket-porsian',
-      },
-      {
-        title: 'Paket Family',
-        products: menuData.family || [],
-        id: 'paket-family',
-      },
-      {
-        title: 'Paket Hampers',
-        products: menuData.hampers || [],
-        id: 'paket-hampers',
-      },
-      {
-        title: 'Frozen Food & Sambal',
-        products: menuData.frozenFood || [],
-        id: 'frozen-food',
-      },
-    ];
-  };
-
+  // Loading state
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-xl font-semibold text-gray-700">
-          Loading menu...
-        </div>
+        <div className="text-xl font-semibold text-gray-700">Loading menu...</div>
       </div>
     );
   }
@@ -222,8 +186,8 @@ function Index() {
 
   return (
     <div className="min-h-screen flex flex-col bg-white shadow-md overflow-x-hidden">
-      {/* Fixed Navigation Container at normal scale */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md w-full">
+      {/* Fixed Navigation */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md w-full pt-2">
         <Navbar onSearch={handleSearch} />
         <CategoryNav
           onCategoryClick={handleCategoryClick}
@@ -231,29 +195,29 @@ function Index() {
         />
       </div>
 
-      {/* Spacer div to push content below the fixed header */}
-      <div className="h-[130px]"></div>
+      {/* Content with proper spacing for fixed header */}
+      <div className="h-[100px]"></div> {/* Reduced from h-[120px] to h-[100px] */}
 
-      {/* Apply the 80% scale to the content only */}
+      {/* Scaled content container */}
       <div
         className="flex-grow origin-top"
         style={{
           transform: 'scale(0.8)',
-          width: '125%', // 1/0.8 = 1.25 = 125%
-          marginLeft: '-12.5%', // ((1/0.8) - 1)/2 * -100% = -12.5%
-          marginBottom: '-20%', // This helps prevent extra space at the bottom
+          width: '125%',
+          marginLeft: '-12.5%',
+          marginBottom: '-20%',
         }}
       >
+        {/* Hero Banner - only show when not searching */}
         {!isSearching && <HeroBanner />}
 
-        {/* Product sections remain the same */}
+        {/* Product Sections */}
         <div className="w-full px-4 md:px-8 py-4">
-          {/* Render product sections based on active category or search */}
           {productsToShow.map((section, index) => (
             <div
-              key={index}
+              key={section.id || index}
               id={section.id}
-              className="scroll-mt-40" // Increased to account for fixed navbar height
+              className="scroll-mt-40"
             >
               <ProductSection
                 title={section.title}
@@ -266,17 +230,14 @@ function Index() {
           ))}
         </div>
 
-        {/* Show message when no search results found */}
+        {/* No search results message */}
         {isSearching && searchResults.length === 0 && (
           <div className="text-center py-10">
             <p className="text-xl text-gray-600">
               No products found matching "{searchQuery}"
             </p>
             <button
-              onClick={() => {
-                setIsSearching(false);
-                setSearchQuery('');
-              }}
+              onClick={clearSearch}
               className="mt-4 px-6 py-2 bg-orange-500 text-white rounded-full hover:bg-orange-600 transition-colors"
             >
               Clear Search
@@ -287,7 +248,7 @@ function Index() {
         <Footer />
       </div>
 
-      {/* Notification remains outside scaled content */}
+      {/* Notification Toast */}
       {notification && (
         <div
           className={`fixed bottom-4 right-4 px-4 py-2 rounded-lg shadow-lg z-50 ${
@@ -298,9 +259,9 @@ function Index() {
         </div>
       )}
 
+      {/* Global styles */}
       <style jsx global>{`
-        html,
-        body {
+        html, body {
           overflow-x: hidden;
         }
       `}</style>
