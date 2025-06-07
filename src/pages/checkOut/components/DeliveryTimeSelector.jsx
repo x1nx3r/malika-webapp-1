@@ -1,5 +1,46 @@
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import { useState, useEffect } from "react";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { id } from "date-fns/locale";
+import TextField from "@mui/material/TextField";
+import Paper from "@mui/material/Paper";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+
+// Create a custom theme to match your amber color scheme
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#f59e0b", // amber-500
+    },
+    background: {
+      paper: "#ffffff",
+    },
+  },
+  typography: {
+    fontFamily: "'Poppins', sans-serif",
+  },
+  components: {
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+          "&:hover .MuiOutlinedInput-notchedOutline": {
+            borderColor: "#f59e0b",
+          },
+          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+            borderColor: "#f59e0b",
+            borderWidth: 2,
+          },
+        },
+      },
+    },
+  },
+});
 
 export default function DeliveryTimeSelector({
   selectedDate,
@@ -7,65 +48,108 @@ export default function DeliveryTimeSelector({
   selectedTime,
   setSelectedTime,
 }) {
-  // Time change handlers
-  const handleHoursChange = (e) => {
-    let value = e.target.value;
-    value = Math.min(23, Math.max(0, parseInt(value) || 0))
-      .toString()
-      .padStart(2, "0");
-    setSelectedTime((prev) => ({ ...prev, hours: value }));
+  // Create a single Date object from the separate date and time values
+  const [dateTimeValue, setDateTimeValue] = useState(() => {
+    if (!selectedDate) return null;
+
+    const dateObj = new Date(selectedDate);
+    dateObj.setHours(parseInt(selectedTime.hours || "0", 10));
+    dateObj.setMinutes(parseInt(selectedTime.minutes || "0", 10));
+    return dateObj;
+  });
+
+  // Update the parent component's state when the date/time changes
+  const handleDateTimeChange = (newDateTime) => {
+    setDateTimeValue(newDateTime);
+
+    if (newDateTime) {
+      setSelectedDate(newDateTime);
+
+      const hours = newDateTime.getHours().toString().padStart(2, "0");
+      const minutes = newDateTime.getMinutes().toString().padStart(2, "0");
+      setSelectedTime({ hours, minutes });
+    }
   };
 
-  const handleMinutesChange = (e) => {
-    let value = e.target.value;
-    value = Math.min(59, Math.max(0, parseInt(value) || 0))
-      .toString()
-      .padStart(2, "0");
-    setSelectedTime((prev) => ({ ...prev, minutes: value }));
-  };
+  // Update local state if the parent state changes
+  useEffect(() => {
+    if (selectedDate) {
+      const dateObj = new Date(selectedDate);
+      dateObj.setHours(parseInt(selectedTime.hours || "0", 10));
+      dateObj.setMinutes(parseInt(selectedTime.minutes || "0", 10));
+      setDateTimeValue(dateObj);
+    }
+  }, [selectedDate, selectedTime]);
 
   return (
-    <div className="p-3 border-b border-slate-300">
-      <h2 className="text-stone-950 text-lg font-semibold font-poppins mb-2">
-        Pilih Waktu Tiba
-      </h2>
-      <div className="mb-2 flex items-center gap-2">
-        <div
-          className="h-8 rounded border border-slate-500 flex items-center justify-between px-2 cursor-pointer flex-grow"
-          onClick={() => document.getElementById("datePicker").click()}
-        >
-          <span className="text-stone-500 text-sm font-poppins">
-            {selectedDate
-              ? selectedDate.toLocaleDateString("id-ID")
-              : "Pilih tanggal"}
-          </span>
-          <div className="w-3 h-3 bg-stone-800"></div>
-          <DatePicker
-            id="datePicker"
-            selected={selectedDate}
-            onChange={(date) => setSelectedDate(date)}
-            minDate={new Date()}
-            className="hidden"
+    <ThemeProvider theme={theme}>
+      <Paper
+        elevation={0}
+        sx={{ p: 2, border: "1px solid #e5e7eb", borderRadius: 2 }}
+      >
+        <Box sx={{ mb: 2, display: "flex", alignItems: "center" }}>
+          <CalendarTodayIcon sx={{ color: "#f59e0b", mr: 1, fontSize: 20 }} />
+          <Typography
+            variant="subtitle1"
+            sx={{ fontWeight: 500, color: "#374151" }}
+          >
+            Waktu Pengiriman
+          </Typography>
+        </Box>
+
+        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={id}>
+          <DateTimePicker
+            label="Tanggal dan Waktu"
+            value={dateTimeValue}
+            onChange={handleDateTimeChange}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                fullWidth
+                InputProps={{
+                  ...params.InputProps,
+                  startAdornment: (
+                    <>
+                      <AccessTimeIcon color="action" sx={{ mr: 1 }} />
+                      {params.InputProps.startAdornment}
+                    </>
+                  ),
+                }}
+              />
+            )}
+            minDateTime={new Date()}
+            minutesStep={15}
+            ampm={false}
+            views={["year", "month", "day", "hours", "minutes"]}
+            inputFormat="EEEE, d MMMM yyyy HH:mm"
           />
-        </div>
-        <div className="h-8 rounded border border-slate-500 flex items-center justify-center px-2">
-          <input
-            type="text"
-            value={selectedTime.hours}
-            onChange={handleHoursChange}
-            className="w-8 text-center bg-transparent text-stone-950 text-base font-poppins"
-            maxLength="2"
-          />
-          <span className="text-black mx-1 font-poppins">:</span>
-          <input
-            type="text"
-            value={selectedTime.minutes}
-            onChange={handleMinutesChange}
-            className="w-8 text-center bg-transparent text-stone-950 text-base font-poppins"
-            maxLength="2"
-          />
-        </div>
-      </div>
-    </div>
+        </LocalizationProvider>
+
+        <Box sx={{ mt: 1.5, display: "flex", alignItems: "center" }}>
+          <Typography
+            variant="caption"
+            sx={{ color: "#6b7280", display: "flex", alignItems: "center" }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ marginRight: 4 }}
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            Waktu pengiriman dalam format 24 jam
+          </Typography>
+        </Box>
+      </Paper>
+    </ThemeProvider>
   );
 }
