@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
-function ProfileNavbar() {
+function ProfileHeader() {
   const navigate = useNavigate();
 
   return (
@@ -34,4 +34,4 @@ function ProfileNavbar() {
   );
 }
 
-export default ProfileNavbar;
+export default ProfileHeader;

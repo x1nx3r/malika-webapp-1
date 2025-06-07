@@ -1,5 +1,5 @@
 import { useState } from "react";
-import ProfileNavbar from "./components/ProfileNavbar";
+import ProfileHeader from "./components/ProfileHeader";
 import UserIdentity from "./components/UserIdentity";
 import AddAddress from "./components/AddAddress";
 import AddressList from "./components/AddressList";
@@ -24,7 +24,7 @@ function ProfilePage() {
 
   return (
     <div className="min-h-screen pb-20">
-      <ProfileNavbar />
+      <ProfileHeader />
       <div className="max-w-3xl mx-auto pt-20 pb-4 py-6">
         <UserIdentity />
         <AddAddress onAddAddress={handleAddAddress} />
