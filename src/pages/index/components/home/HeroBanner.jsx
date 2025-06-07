@@ -1,6 +1,7 @@
 function HeroBanner() {
   return (
-    <section className="w-full px-4 sm:px-6 lg:px-8 my-3 sm:my-6">
+    // Add top margin/padding to account for fixed navbar and category nav
+    <section className="w-full px-4 sm:px-6 lg:px-8 my-3 sm:my-6 mt-32 sm:mt-36 md:mt-40">
       <div className="container mx-auto relative rounded-lg sm:rounded-[1.25rem] overflow-hidden">
         <img
           className="w-full h-[12rem] sm:h-[18rem] md:h-[24rem] lg:h-[28.125rem] object-cover rounded-lg sm:rounded-[1.25rem]"
@@ -29,8 +30,16 @@ function HeroBanner() {
 
             {/* Contact Buttons - Stack on mobile, side by side on larger screens */}
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 mt-6 md:mt-0 md:p-0">
-              <ContactButton icon={<PhoneIcon />} text="082257374357" />
-              <ContactButton icon={<MapIcon />} text="Google Maps" />
+              <ContactButton
+                icon={<PhoneIcon />}
+                text="082257374357"
+                link="https://wa.me/6282257374357"
+              />
+              <ContactButton
+                icon={<MapIcon />}
+                text="Google Maps"
+                link="https://maps.app.goo.gl/txMSUQ1NK7qJc5Tm7"
+              />
             </div>
           </div>
 
@@ -51,16 +60,21 @@ function HeroBanner() {
   );
 }
 
-function ContactButton({ icon, text }) {
+function ContactButton({ icon, text, link }) {
   return (
-    <div className="w-full h-[3rem] sm:h-[3.4rem] flex items-center justify-center rounded-full outline outline-1 outline-[#F0F0F0] -outline-offset-1 px-6">
+    <a
+      href={link}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="w-full h-[3rem] sm:h-[3.4rem] flex items-center justify-center rounded-full outline outline-1 outline-[#F0F0F0] -outline-offset-1 px-6 hover:bg-white/10 transition-colors duration-200 cursor-pointer"
+    >
       <div className="w-[1.75rem] sm:w-[2.25rem] h-[1.75rem] sm:h-[2.25rem] mr-2 sm:mr-4 flex items-center justify-center">
         {icon}
       </div>
       <div className="text-white text-base sm:text-xl md:text-2xl font-semibold font-['Poppins']">
         {text}
       </div>
-    </div>
+    </a>
   );
 }
 
