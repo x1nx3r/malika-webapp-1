@@ -21,6 +21,7 @@ export default async function handler(req, res) {
   console.log("\n--- Order Detail API Request ---");
   console.log("Method:", req.method);
   console.log("Order ID:", req.query.orderId);
+  console.log("Query Params:", req.query);
 
   // Enable CORS
   res.setHeader("Access-Control-Allow-Credentials", true);
@@ -48,7 +49,12 @@ export default async function handler(req, res) {
     // Verify token
     const decodedToken = await admin.auth().verifyIdToken(token);
     const userId = decodedToken.uid;
-    const isAdmin = decodedToken.admin === true;
+    // const isAdmin = decodedToken.admin === true;
+
+    const userDoc = await db.collection("users").doc(userId).get();
+    const userRole = userDoc.exists ? userDoc.data().role : "user";
+    const isAdmin = userRole === "admin";
+
     console.log(`Authenticated user: ${userId}, isAdmin: ${isAdmin}`);
 
     // Get the order ID from the URL
@@ -76,6 +82,15 @@ export default async function handler(req, res) {
       });
     }
 
+    // Handle special case for checking payment status
+    if (req.method === "GET" && req.query.checkStatus === "true") {
+      console.log("Handling payment status check request");
+      return res.status(200).json({
+        statusDownPayment: orderData.paymentInfo?.statusDownPayment || 'pending',
+        statusRemainingPayment: orderData.paymentInfo?.statusRemainingPayment || 'pending'
+      });
+    }
+
     // Handle different HTTP methods
     if (req.method === "GET") {
       // Format timestamp fields for JSON serialization
@@ -97,6 +112,8 @@ export default async function handler(req, res) {
       const updateData =
         typeof req.body === "object" ? req.body : JSON.parse(req.body);
 
+      console.log("Update data received:", updateData);
+
       // Create sanitized update object
       const allowedUpdates = {};
 
@@ -111,22 +128,62 @@ export default async function handler(req, res) {
         }
       } else {
         // Admins can update most fields
-        const { userId, createdAt, ...rest } = updateData;
-        Object.assign(allowedUpdates, rest);
+        const { userId: bodyUserId, createdAt, ...rest } = updateData;
+        
+        // Handle nested updates for paymentInfo
+        if (rest.paymentInfo) {
+          // Merge dengan paymentInfo yang sudah ada
+          allowedUpdates.paymentInfo = {
+            ...orderData.paymentInfo,
+            ...rest.paymentInfo
+          };
+          
+          // Update total jika ada perubahan shipping cost
+          if (rest.paymentInfo.shipingCost !== undefined) {
+            allowedUpdates.paymentInfo.total = 
+              (orderData.paymentInfo.subtotal || 0) + 
+              (rest.paymentInfo.shipingCost || 0);
+          }
+        }
+        
+        // Handle status update
+        if (rest.status && rest.status !== orderData.status) {
+          // Validasi transisi status
+          const validTransitions = {
+            pending: ['processed', 'cancelled'],
+            processed: ['delivery', 'paid', 'cancelled'],
+            delivery: ['arrived', 'cancelled'],
+            arrived: ['paid', 'completed'],
+            paid: ['completed', 'delivery', 'arrived'],
+            completed: [],
+            cancelled: []
+          };
 
-        if (updateData.status && updateData.status !== orderData.status) {
-          allowedUpdates.statusHistory = orderData.statusHistory || [];
-          allowedUpdates.statusHistory.push({
+          if (!validTransitions[orderData.status]?.includes(rest.status)) {
+            return res.status(400).json({
+              error: `Transisi status tidak valid: dari ${orderData.status} ke ${rest.status}`
+            });
+          }
+
+          allowedUpdates.status = rest.status;
+          
+          // Create a new status history entry
+          const newStatusEntry = {
             from: orderData.status,
-            to: updateData.status,
-            timestamp: admin.firestore.FieldValue.serverTimestamp(),
-            updatedBy: userId,
-          });
+            to: rest.status,
+            timestamp: admin.firestore.Timestamp.now(),
+            updatedBy: userId
+          };
+          
+          const currentStatusHistory = orderData.statusHistory || [];
+          allowedUpdates.statusHistory = [...currentStatusHistory, newStatusEntry];
         }
       }
 
       // Add updated timestamp
       allowedUpdates.updatedAt = admin.firestore.FieldValue.serverTimestamp();
+
+      console.log("Final allowed updates:", allowedUpdates);
 
       await ordersCollection.doc(orderId).update(allowedUpdates);
 

@@ -6,9 +6,11 @@ export default function AdminHeader({ activeTab, onTabChange }) {
 
   const handleNavigation = (tab) => {
     if (tab === "pesanan") {
-      navigate("/admin"); // Navigate to AdminPenjualan
+      navigate("/admin");
     } else if (tab === "laporan") {
-      navigate("/admin/keuangan"); // Navigate to AdminKeuangan
+      navigate("/admin/keuangan");
+    } else if (tab === "kelolamenu") {
+      navigate("/admin/kelolamenu");
     }
 
     // Also call the onTabChange function if it exists
@@ -44,13 +46,23 @@ export default function AdminHeader({ activeTab, onTabChange }) {
         >
           Laporan Penjualan
         </button>
+        <button
+          className={`px-8 py-3 border border-slate-900 rounded-full ${
+            activeTab === "kelolamenu"
+              ? "bg-slate-900 text-white"
+              : "text-slate-900"
+          } font-semibold`}
+          onClick={() => handleNavigation("kelolamenu")}
+        >
+          Kelola Menu
+        </button>
       </div>
     </header>
   );
 }
 
 AdminHeader.propTypes = {
-  activeTab: PropTypes.oneOf(["pesanan", "laporan"]),
+  activeTab: PropTypes.oneOf(["pesanan", "laporan", "kelolamenu"]),
   onTabChange: PropTypes.func,
 };
 

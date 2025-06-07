@@ -100,10 +100,16 @@ export default function Checkout() {
         },
         paymentInfo: {
           downPaymentPercent,
-          downPaymentAmount,
-          subtotal,
         },
-        items: cartItems,
+        items: cartItems.map(item => ({
+          id: item.id,
+          name: item.name,
+          category: item.category,
+          imageUrl: item.imageUrl,
+          kemasan: item.kemasan,
+          price: item.price,
+          quantity: item.quantity
+        })),
       };
 
       const response = await fetch("/api/orders", {
