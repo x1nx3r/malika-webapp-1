@@ -6,14 +6,14 @@ function CategoryButton({ name, isActive, onClick }) {
     <button
       onClick={() => onClick(name)}
       className={`
-        flex-shrink-0 rounded-full px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 
+        flex-1 rounded-full px-2 sm:px-3 md:px-4 py-2 sm:py-2.5 
         transition-all duration-300 transform hover:scale-105
         ${
           isActive
             ? 'bg-black text-white shadow-lg font-bold'
             : 'text-white hover:bg-white/20 font-medium'
         }
-        text-sm sm:text-base whitespace-nowrap
+        text-xs sm:text-sm md:text-base whitespace-nowrap mx-1
       `}
     >
       {name}

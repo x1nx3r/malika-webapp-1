@@ -98,10 +98,11 @@ function Index() {
     }
 
     setIsSearching(true);
-    const results = allProducts.filter((product) =>
-      product.name.toLowerCase().includes(query.toLowerCase()) ||
-      (product.description && 
-       product.description.toLowerCase().includes(query.toLowerCase()))
+    const results = allProducts.filter(
+      (product) =>
+        product.name.toLowerCase().includes(query.toLowerCase()) ||
+        (product.description &&
+          product.description.toLowerCase().includes(query.toLowerCase()))
     );
     setSearchResults(results);
   };
@@ -117,8 +118,9 @@ function Index() {
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
     if (element) {
-      const yOffset = -140; // Reduced from -180 to -140
-      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      const yOffset = -250; // Reduced from -180 to -140
+      const y =
+        element.getBoundingClientRect().top + window.pageYOffset + yOffset;
       window.scrollTo({ top: y, behavior: 'smooth' });
     }
   };
@@ -126,19 +128,37 @@ function Index() {
   // Get products to display based on search state
   const getProductsToShow = () => {
     if (isSearching) {
-      return [{
-        title: `Search Results for "${searchQuery}"`,
-        products: searchResults,
-        id: 'search-results',
-      }];
+      return [
+        {
+          title: `Search Results for "${searchQuery}"`,
+          products: searchResults,
+          id: 'search-results',
+        },
+      ];
     }
 
     return [
-      { title: 'Rekomendasi', products: menuData.bestSellers, id: 'rekomendasi' },
-      { title: 'Paket Porsian', products: menuData.porsian, id: 'paket-porsian' },
+      {
+        title: 'Rekomendasi',
+        products: menuData.bestSellers,
+        id: 'rekomendasi',
+      },
+      {
+        title: 'Paket Porsian',
+        products: menuData.porsian,
+        id: 'paket-porsian',
+      },
       { title: 'Paket Family', products: menuData.family, id: 'paket-family' },
-      { title: 'Paket Hampers', products: menuData.hampers, id: 'paket-hampers' },
-      { title: 'Frozen Food & Sambal', products: menuData.frozenFood, id: 'frozen-food' },
+      {
+        title: 'Paket Hampers',
+        products: menuData.hampers,
+        id: 'paket-hampers',
+      },
+      {
+        title: 'Frozen Food & Sambal',
+        products: menuData.frozenFood,
+        id: 'frozen-food',
+      },
     ];
   };
 
@@ -154,14 +174,16 @@ function Index() {
 
         const token = await user.getIdToken();
         const data = await getMenuData(token);
-        
+
         setAllProducts(data);
         setMenuData({
           bestSellers: data.slice(0, 4),
           porsian: data.filter((item) => item.category === 'Paket Porsian'),
           family: data.filter((item) => item.category === 'Paket Family'),
           hampers: data.filter((item) => item.category === 'Paket Hampers'),
-          frozenFood: data.filter((item) => item.category === 'Frozen Food & Sambal'),
+          frozenFood: data.filter(
+            (item) => item.category === 'Frozen Food & Sambal'
+          ),
         });
       } catch (error) {
         console.error('Error fetching menu data:', error);
@@ -177,7 +199,9 @@ function Index() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-xl font-semibold text-gray-700">Loading menu...</div>
+        <div className="text-xl font-semibold text-gray-700">
+          Loading menu...
+        </div>
       </div>
     );
   }
@@ -196,20 +220,24 @@ function Index() {
       </div>
 
       {/* Content with proper spacing for fixed header */}
-      <div className="h-[100px]"></div> {/* Reduced from h-[120px] to h-[100px] */}
+      <div className="h-[100px]"></div>
 
       {/* Scaled content container */}
       <div
-        className="flex-grow origin-top"
+        className="flex-grow origin-top overflow-hidden" // Added overflow-hidden
         style={{
           transform: 'scale(0.8)',
           width: '125%',
           marginLeft: '-12.5%',
-          marginBottom: '-20%',
+          marginBottom: '-30%', // Increased to -30% for better removal of whitespace
+          minHeight: 'fit-content', // Ensure it fits content properly
         }}
       >
         {/* Hero Banner - only show when not searching */}
         {!isSearching && <HeroBanner />}
+
+        {/* Add extra spacing when searching to prevent navbar blocking */}
+        {isSearching && <div className="h-[60px] sm:h-[80px]"></div>}
 
         {/* Product Sections */}
         <div className="w-full px-4 md:px-8 py-4">
@@ -261,7 +289,8 @@ function Index() {
 
       {/* Global styles */}
       <style jsx global>{`
-        html, body {
+        html,
+        body {
           overflow-x: hidden;
         }
       `}</style>
