@@ -15,6 +15,7 @@ import Checkout from "./pages/checkOut/checkOut";
 import PaymentRedirect from "./pages/payment/components/paymentRedirect";
 import PaymentPage from "./pages/payment/paymentPage";
 import ProfilePage from "./pages/profile/profilePage";
+import HistoryPage from "./pages/history/historyPage";
 
 const AppWrapper = () => {
   const [user, setUser] = useState(null);
@@ -125,6 +126,7 @@ const AppWrapper = () => {
         <Route path="/payment" element={<PaymentRedirect />} />
         <Route path="/payment/:orderId" element={<PaymentPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/history" element={<HistoryPage />} />
       </Routes>
     </BrowserRouter>
   );

@@ -81,7 +81,7 @@ export default function OrderCard({
               Atas Nama: {order.customer}
             </h3>
             <span
-              className={`px-3 py-1 rounded-lg drop-shadow text-white ${statusColor}`}
+              className={`px-3 py-1 rounded-lg drop-shadow font-poppins ${statusColor}`}
             >
               {statusLabel}
             </span>

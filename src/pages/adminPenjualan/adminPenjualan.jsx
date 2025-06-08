@@ -56,13 +56,13 @@ export default function AdminPenjualan() {
 
   // Status colors for UI styling
   const statusColors = {
-    pending: "bg-orange-500",
-    processed: "bg-yellow-500",
-    delivery: "bg-blue-500",
-    arrived: "bg-green-500",
-    paid: "bg-green-500",
-    completed: "bg-green-500",
-    cancelled: "bg-red-500"
+    pending: "bg-orange-500 text-white",
+    processed: "bg-yellow-300 text-gray-800",
+    delivery: "bg-blue-500 text-white",
+    arrived: "bg-green-300 text-gray-800",
+    paid: "bg-green-500 text-gray-800",
+    completed: "bg-green-500 text-gray-800",
+    cancelled: "bg-red-500 text-white"
   };
 
   // Effect untuk handle scroll dan sticky behavior
