@@ -8,7 +8,7 @@ function ProfileHeader() {
         <div className="w-full h-16 bg-green-700 rounded-bl-2xl rounded-br-2xl mb-6">
             <div className="absolute right-34 top-3">
                 <button
-                onClick={() => navigate(-1)}
+                onClick={() => navigate("/")}
                 className="w-[130px] h-10 bg-white rounded-lg overflow-hidden flex justify-center items-center hover:bg-gray-100 transition-all duration-200 ease-in"
                 >
                     <div className="mr-1">
@@ -29,7 +29,7 @@ function ProfileHeader() {
                 Profil Akun Saya
                 </h1>
             </div>
-            </div>
+        </div>
     </div>
   );
 }
