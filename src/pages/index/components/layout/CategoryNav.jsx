@@ -1,19 +1,19 @@
 /* eslint-disable react/prop-types */
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 function CategoryButton({ name, isActive, onClick }) {
   return (
     <button
       onClick={() => onClick(name)}
       className={`
-        flex-1 rounded-full px-2 sm:px-3 md:px-4 py-2 sm:py-2.5 
-        transition-all duration-300 transform hover:scale-105
+        flex-shrink-0 rounded-full px-3 py-1.5
+        transition-all duration-200 hover:scale-[1.02]
         ${
           isActive
-            ? 'bg-black text-white shadow-lg font-bold'
-            : 'text-white hover:bg-white/20 font-medium'
+            ? "bg-black text-white font-semibold"
+            : "text-white hover:bg-white/10 font-medium"
         }
-        text-xs sm:text-sm md:text-base whitespace-nowrap mx-1
+        text-xs sm:text-sm whitespace-nowrap mx-1
       `}
     >
       {name}
@@ -25,7 +25,7 @@ function CategoryNav({
   onCategoryClick,
   activeCategory: externalActiveCategory,
 }) {
-  const [localActiveCategory, setLocalActiveCategory] = useState('Rekomendasi');
+  const [localActiveCategory, setLocalActiveCategory] = useState("Rekomendasi");
 
   // Sync local state with external state if provided
   useEffect(() => {
@@ -35,24 +35,24 @@ function CategoryNav({
   }, [externalActiveCategory]);
 
   const categories = [
-    { name: 'Rekomendasi' },
-    { name: 'Paket Porsian' },
-    { name: 'Paket Family' },
-    { name: 'Paket Hampers' },
-    { name: 'Frozen Food & Sambal' },
+    { name: "Rekomendasi" },
+    { name: "Paket Porsian" },
+    { name: "Paket Family" },
+    { name: "Paket Hampers" },
+    { name: "Frozen Food & Sambal" },
   ];
 
   const handleCategoryClick = (categoryName) => {
     setLocalActiveCategory(categoryName);
     if (onCategoryClick) {
       onCategoryClick(categoryName);
-    } 
+    }
   };
 
   return (
-    <div className="w-full px-2 sm:px-4 lg:px-6 my-1 overflow-x-auto custom-scrollbar">
-      <div className="container mx-auto flex justify-center">
-        <div className="w-full max-w-6xl bg-gradient-to-r from-[#FC8A06] to-[#FF6B35] rounded-full flex items-center justify-center px-4 sm:px-6 py-3 sm:py-3.5 h-[3rem] sm:h-[3.5rem] space-x-2 sm:space-x-3 md:space-x-4 lg:space-x-6 shadow-lg">
+    <div className="w-full px-2 pb-1 overflow-x-auto no-scrollbar">
+      <div className="flex justify-center">
+        <div className="bg-gradient-to-r from-[#FC8A06] to-[#FF6B35] rounded-full flex items-center py-2 px-2 h-12 shadow-md">
           {categories.map((category, index) => (
             <CategoryButton
               key={index}
@@ -64,15 +64,19 @@ function CategoryNav({
         </div>
       </div>
       <style jsx>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          height: 4px;
+        .no-scrollbar::-webkit-scrollbar {
+          height: 3px;
         }
-        .custom-scrollbar::-webkit-scrollbar-track {
+        .no-scrollbar::-webkit-scrollbar-track {
           background: #f1f1f1;
         }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
+        .no-scrollbar::-webkit-scrollbar-thumb {
           background: #fc8a06;
           border-radius: 10px;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: thin;
         }
       `}</style>
     </div>
