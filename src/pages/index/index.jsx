@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import ScaleWrapper from "./components/ui/ScaleWrapper";
+import { useState, useEffect } from "react";
 import Navbar from "./components/layout/Navbar";
 import CategoryNav from "./components/layout/CategoryNav";
 import HeroBanner from "./components/home/HeroBanner";
@@ -9,6 +8,7 @@ import { getMenuData } from "../../services/menuService";
 import { auth } from "../../firebase";
 
 function Index() {
+  // State management
   const [menuData, setMenuData] = useState({
     bestSellers: [],
     porsian: [],
@@ -16,24 +16,34 @@ function Index() {
     hampers: [],
     frozenFood: [],
   });
+  const [allProducts, setAllProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [notification, setNotification] = useState(null);
-  // Track which items are being added to cart
   const [addingItems, setAddingItems] = useState(new Set());
+  const [activeCategory, setActiveCategory] = useState("Rekomendasi");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
 
-  // Add to cart handler
+  // Category mapping for smooth scrolling
+  const categoryScrollMap = {
+    Rekomendasi: "rekomendasi",
+    "Paket Porsian": "paket-porsian",
+    "Paket Family": "paket-family",
+    "Paket Hampers": "paket-hampers",
+    "Frozen Food & Sambal": "frozen-food",
+  };
+
+  // Add to cart functionality
   const handleAddToCart = async (product) => {
-    if (addingItems.has(product.id)) return; // Prevent double-clicks
+    if (addingItems.has(product.id)) return;
 
     try {
-      // Add item to loading state
       setAddingItems((prev) => new Set([...prev, product.id]));
 
       const response = await fetch("/api/cart", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: product.id,
           name: product.name,
@@ -43,30 +53,116 @@ function Index() {
           imageUrl: product.imageUrl,
           quantity: 1,
         }),
+        credentials: "include",
       });
 
       if (!response.ok) throw new Error("Failed to add to cart");
 
-      setNotification({
-        type: "success",
-        message: `${product.name} added to cart`,
-      });
+      showNotification("success", `${product.name} added to cart`);
     } catch (error) {
       console.error("Error adding to cart:", error);
-      setNotification({
-        type: "error",
-        message: "Failed to add item to cart",
-      });
+      showNotification("error", "Failed to add item to cart");
     } finally {
-      // Remove item from loading state
       setAddingItems((prev) => {
         const next = new Set(prev);
         next.delete(product.id);
         return next;
       });
-      setTimeout(() => setNotification(null), 2000);
     }
   };
+
+  // Notification helper
+  const showNotification = (type, message) => {
+    setNotification({ type, message });
+    setTimeout(() => setNotification(null), 2000);
+  };
+
+  // Category click handler with smooth scrolling
+  const handleCategoryClick = (categoryName) => {
+    setActiveCategory(categoryName);
+    clearSearch();
+
+    const sectionId = categoryScrollMap[categoryName];
+    if (sectionId) {
+      scrollToSection(sectionId);
+    }
+  };
+
+  // Search functionality
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+
+    if (!query.trim()) {
+      clearSearch();
+      return;
+    }
+
+    setIsSearching(true);
+    const results = allProducts.filter(
+      (product) =>
+        product.name.toLowerCase().includes(query.toLowerCase()) ||
+        (product.description &&
+          product.description.toLowerCase().includes(query.toLowerCase())),
+    );
+    setSearchResults(results);
+  };
+
+  // Clear search state
+  const clearSearch = () => {
+    setIsSearching(false);
+    setSearchQuery("");
+    setSearchResults([]);
+  };
+
+  // Smooth scroll to section
+  const scrollToSection = (sectionId) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      const yOffset = -120; // Adjusted for sticky header height
+      const y =
+        element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: "smooth" });
+    }
+  };
+
+  // Get products to display based on search state
+  const getProductsToShow = () => {
+    if (isSearching) {
+      return [
+        {
+          title: `Search Results for "${searchQuery}"`,
+          products: searchResults,
+          id: "search-results",
+        },
+      ];
+    }
+
+    return [
+      {
+        title: "Rekomendasi",
+        products: menuData.bestSellers,
+        id: "rekomendasi",
+      },
+      {
+        title: "Paket Porsian",
+        products: menuData.porsian,
+        id: "paket-porsian",
+      },
+      { title: "Paket Family", products: menuData.family, id: "paket-family" },
+      {
+        title: "Paket Hampers",
+        products: menuData.hampers,
+        id: "paket-hampers",
+      },
+      {
+        title: "Frozen Food & Sambal",
+        products: menuData.frozenFood,
+        id: "frozen-food",
+      },
+    ];
+  };
+
+  // Fetch menu data on component mount
   useEffect(() => {
     const fetchMenuData = async () => {
       try {
@@ -79,7 +175,8 @@ function Index() {
         const token = await user.getIdToken();
         const data = await getMenuData(token);
 
-        const categorizedData = {
+        setAllProducts(data);
+        setMenuData({
           bestSellers: data.slice(0, 4),
           porsian: data.filter((item) => item.category === "Paket Porsian"),
           family: data.filter((item) => item.category === "Paket Family"),
@@ -87,9 +184,7 @@ function Index() {
           frozenFood: data.filter(
             (item) => item.category === "Frozen Food & Sambal",
           ),
-        };
-
-        setMenuData(categorizedData);
+        });
       } catch (error) {
         console.error("Error fetching menu data:", error);
       } finally {
@@ -100,6 +195,7 @@ function Index() {
     fetchMenuData();
   }, []);
 
+  // Loading state
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -110,63 +206,75 @@ function Index() {
     );
   }
 
+  const productsToShow = getProductsToShow();
+
   return (
-    <ScaleWrapper scale={0.7}>
-      <div className="w-full min-h-screen flex flex-col bg-white shadow-md overflow-x-hidden">
-        <div className="flex-grow">
-          <Navbar />
-          <CategoryNav />
-          <HeroBanner />
-
-          <ProductSection
-            title="Menu Terlaris"
-            products={menuData.bestSellers}
-            onAddToCart={handleAddToCart}
-            addingItems={addingItems} // Pass loading state
-          />
-
-          <ProductSection
-            title="Paket Porsian"
-            products={menuData.porsian}
-            onAddToCart={handleAddToCart}
-            addingItems={addingItems}
-          />
-
-          <ProductSection
-            title="Paket Family"
-            products={menuData.family}
-            onAddToCart={handleAddToCart}
-            addingItems={addingItems}
-          />
-
-          <ProductSection
-            title="Paket Hampers"
-            products={menuData.hampers}
-            onAddToCart={handleAddToCart}
-            addingItems={addingItems}
-          />
-
-          <ProductSection
-            title="Frozen Food & Sambal"
-            products={menuData.frozenFood}
-            onAddToCart={handleAddToCart}
-            addingItems={addingItems}
+    <div className="min-h-screen flex justify-center bg-gray-100">
+      {/* Main container with constrained width */}
+      <div className="relative w-full bg-white shadow-md">
+        {/* Sticky header wrapper */}
+        <div className="sticky top-0 z-50 bg-white shadow-md">
+          <Navbar onSearch={handleSearch} />
+          <CategoryNav
+            onCategoryClick={handleCategoryClick}
+            activeCategory={activeCategory}
           />
         </div>
 
-        <Footer />
+        {/* Main content */}
+        <div className="w-full">
+          {/* Hero Banner - only show when not searching */}
+          {!isSearching && <HeroBanner />}
 
+          {/* Product Sections */}
+          <div className="w-full px-4 py-4">
+            {productsToShow.map((section, index) => (
+              <div
+                key={section.id || index}
+                id={section.id}
+                className="scroll-mt-36" // Adjusted for sticky header
+              >
+                <ProductSection
+                  title={section.title}
+                  products={section.products}
+                  onAddToCart={handleAddToCart}
+                  addingItems={addingItems}
+                  showEmptyMessage={isSearching && searchResults.length === 0}
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* No search results message */}
+          {isSearching && searchResults.length === 0 && (
+            <div className="text-center py-10">
+              <p className="text-xl text-gray-600">
+                No products found matching "{searchQuery}"
+              </p>
+              <button
+                onClick={clearSearch}
+                className="mt-4 px-6 py-2 bg-orange-500 text-white rounded-full hover:bg-orange-600 transition-colors"
+              >
+                Clear Search
+              </button>
+            </div>
+          )}
+
+          <Footer />
+        </div>
+
+        {/* Notification Toast */}
         {notification && (
           <div
-            className={`fixed bottom-4 right-4 px-6 py-3 rounded-md shadow-lg text-white
-              ${notification.type === "success" ? "bg-green-500" : "bg-red-500"}
-              transition-opacity duration-300`}
+            className={`fixed bottom-4 right-4 px-4 py-2 rounded-lg shadow-lg z-50 ${
+              notification.type === "success" ? "bg-green-500" : "bg-red-500"
+            } text-white`}
           >
             {notification.message}
           </div>
         )}
       </div>
-    </ScaleWrapper>
+    </div>
   );
 }
 

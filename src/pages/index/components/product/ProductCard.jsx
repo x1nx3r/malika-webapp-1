@@ -1,61 +1,88 @@
 function ProductCard({ product, onAddToCart, isLoading }) {
   return (
-    <div className="w-full sm:w-[20rem] md:w-[32.94rem] h-auto md:h-[15.625rem] bg-white shadow-xl rounded-[0.75rem] sm:rounded-[1rem] flex flex-col md:flex-row overflow-hidden">
-      <div className="p-4 sm:py-6 sm:pl-6 sm:pr-0 flex flex-col justify-between flex-1">
+    <div className="w-full sm:w-80 md:w-full max-w-2xl h-auto md:h-60 bg-white rounded-lg shadow-lg flex flex-col md:flex-row overflow-hidden">
+      {/* Product Details Section */}
+      <div className="p-3 md:p-4 flex flex-col justify-between flex-1">
         <div>
-          <div className="mb-4">
-            <span className="text-[#0E0E0E] text-lg sm:text-[1.3rem] font-semibold font-['Poppins'] block leading-tight sm:leading-[1.44rem] sm:mb-2">
+          <div className="mb-2">
+            <h3 className="text-gray-900 text-base md:text-lg font-semibold mb-1">
               {product.name}
-            </span>
-            <span className="text-[#0E0E0E] text-sm sm:text-lg font-semibold font-['Poppins'] block leading-tight sm:leading-[1.25rem]">
+            </h3>
+            <p className="text-gray-800 text-xs md:text-sm font-medium">
               Kemasan: {product.kemasan}
-            </span>
+            </p>
           </div>
-          <div className="text-[#0E0E0E] text-sm sm:text-lg font-normal font-['Poppins'] leading-tight sm:leading-[1.563rem]">
+          {/* Description with truncation */}
+          <p className="text-gray-700 text-xs md:text-sm leading-snug line-clamp">
             {product.description}
-          </div>
+          </p>
         </div>
-        <div className="text-[#0E0E0E] text-lg sm:text-2xl font-bold font-['Poppins'] mt-4 md:mt-0">
+        <div className="text-gray-900 text-base md:text-lg font-bold mt-2 md:mt-0">
           Rp{product.price.toLocaleString("id-ID")},-
         </div>
       </div>
 
+      {/* Image Section with Add Button */}
       <div className="relative order-first md:order-last">
         <img
-          className="w-full h-[10rem] md:w-[12.625rem] md:h-[12.625rem] object-cover md:m-6 rounded-none md:rounded-[0.75rem]"
+          className="w-full h-36 md:w-48 md:h-48 object-cover md:m-6 md:rounded-lg"
           src={product.imageUrl}
           alt={product.name}
         />
+
         <button
           onClick={() => onAddToCart(product)}
           disabled={isLoading}
-          className={`w-[3rem] h-[3rem] sm:w-[3.75rem] sm:h-[3.75rem] absolute bottom-3 right-3 md:bottom-6 md:right-6
+          className={`
+            absolute bottom-2 right-2 md:bottom-5 md:right-5
+            w-10 h-10 md:w-12 md:h-12
+            flex items-center justify-center
+            rounded-tl-2xl rounded-br-md
             ${
               isLoading
                 ? "bg-gray-300 cursor-not-allowed"
-                : "bg-white/80 hover:bg-white/90 active:bg-white/100"
+                : "bg-white/80 hover:bg-white hover:shadow-md"
             }
-            transition-all rounded-tl-[1.25rem] sm:rounded-tl-[1.625rem] rounded-br-[0.5rem] sm:rounded-br-[0.75rem]
-            flex items-center justify-center`}
+            transition-all
+          `}
         >
           {isLoading ? (
-            <div className="w-6 h-6 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+            <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
           ) : (
             <svg
-              className="mt-1"
               xmlns="http://www.w3.org/2000/svg"
-              width="29"
-              height="27"
+              className="w-6 h-6 text-[#FC8A06]"
               viewBox="0 0 576 512"
+              fill="currentColor"
             >
-              <path
-                fill="#FC8A06"
-                d="M0 24C0 10.7 10.7 0 24 0h45.5c22 0 41.5 12.8 50.6 32h411c26.3 0 45.5 25 38.6 50.4l-41 152.3c-8.5 31.4-37 53.3-69.5 53.3H170.7l5.4 28.5c2.2 11.3 12.1 19.5 23.6 19.5H488c13.3 0 24 10.7 24 24s-10.7 24-24 24H199.7c-34.6 0-64.3-24.6-70.7-58.5l-51.6-271c-.7-3.8-4-6.5-7.9-6.5H24C10.7 48 0 37.3 0 24m128 440a48 48 0 1 1 96 0a48 48 0 1 1-96 0m336-48a48 48 0 1 1 0 96a48 48 0 1 1 0-96M252 160c0 11 9 20 20 20h44v44c0 11 9 20 20 20s20-9 20-20v-44h44c11 0 20-9 20-20s-9-20-20-20h-44V96c0-11-9-20-20-20s-20 9-20 20v44h-44c-11 0-20 9-20 20"
-              />
+              <path d="M0 24C0 10.7 10.7 0 24 0h45.5c22 0 41.5 12.8 50.6 32h411c26.3 0 45.5 25 38.6 50.4l-41 152.3c-8.5 31.4-37 53.3-69.5 53.3H170.7l5.4 28.5c2.2 11.3 12.1 19.5 23.6 19.5H488c13.3 0 24 10.7 24 24s-10.7 24-24 24H199.7c-34.6 0-64.3-24.6-70.7-58.5l-51.6-271c-.7-3.8-4-6.5-7.9-6.5H24C10.7 48 0 37.3 0 24m128 440a48 48 0 1 1 96 0a48 48 0 1 1-96 0m336-48a48 48 0 1 1 0 96a48 48 0 1 1 0-96M252 160c0 11 9 20 20 20h44v44c0 11 9 20 20 20s20-9 20-20v-44h44c11 0 20-9 20-20s-9-20-20-20h-44V96c0-11-9-20-20-20s-20 9-20 20v44h-44c-11 0-20 9-20 20" />
             </svg>
           )}
         </button>
       </div>
+
+      {/* CSS for line clamping and smaller font sizes */}
+      <style jsx>{`
+        .line-clamp {
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-height: 4.2em; /* Slightly reduced for smaller font */
+          font-size: 0.8125rem; /* 13px */
+          line-height: 1.4;
+        }
+
+        /* Adjust for mobile view with smaller description space */
+        @media (max-width: 768px) {
+          .line-clamp {
+            -webkit-line-clamp: 2;
+            max-height: 2.8em;
+            font-size: 0.75rem; /* 12px on mobile */
+          }
+        }
+      `}</style>
     </div>
   );
 }

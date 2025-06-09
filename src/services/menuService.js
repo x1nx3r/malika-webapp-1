@@ -16,9 +16,10 @@ export const getMenuData = async (token) => {
       name: item.name,
       category: item.category,
       price: item.price,
-      kemasan: item.kemasan || "Styrofoam",
+      kemasan: item.kemasan || "-",
       description: item.description || "",
       imageUrl: item.imageUrl || "",
+      amount: item.amount || "-",
     }));
   } catch (error) {
     console.error("Error fetching menu:", error);

@@ -8,10 +8,15 @@ import TestPage from "./pages/testpage/index";
 import AboutMe from "./pages/aboutme/aboutme";
 import AdminPenjualan from "./pages/adminPenjualan/adminPenjualan";
 import AdminKeuangan from "./pages/adminKeuangan/adminKeuangan";
+import AdminKelolaMenu from "./pages/adminKelolaMenu/adminKelolaMenu";
 import "./index.css";
 import ShoppingCart from "./pages/shoppingCart/shoppingCart";
 import Checkout from "./pages/checkOut/checkOut";
+import PaymentRedirect from "./pages/payment/components/paymentRedirect";
 import PaymentPage from "./pages/payment/paymentPage";
+import ProfilePage from "./pages/profile/profilePage";
+import HistoryPage from "./pages/history/historyPage";
+import HistoryDetailPage from "./pages/history/historyDetailPage";
 
 const AppWrapper = () => {
   const [user, setUser] = useState(null);
@@ -23,7 +28,7 @@ const AppWrapper = () => {
   const refreshToken = async () => {
     try {
       if (auth.currentUser) {
-        console.log("Refreshing auth token...");
+        console.log('Refreshing auth token...');
         const token = await auth.currentUser.getIdToken(true); // Force refresh
         document.cookie = `firebaseToken=${token}; path=/; max-age=3600`; // 1 hour
 
@@ -31,7 +36,7 @@ const AppWrapper = () => {
         scheduleTokenRefresh(55 * 60 * 1000); // 55 minutes
       }
     } catch (error) {
-      console.error("Error refreshing token:", error);
+      console.error('Error refreshing token:', error);
       // If refresh fails, try again in 1 minute
       scheduleTokenRefresh(60 * 1000);
     }
@@ -47,7 +52,7 @@ const AppWrapper = () => {
     // Set new timer
     tokenRefreshTimer.current = setTimeout(refreshToken, delay);
     console.log(
-      `Token refresh scheduled in ${Math.round(delay / 60000)} minutes`,
+      `Token refresh scheduled in ${Math.round(delay / 60000)} minutes`
     );
   };
 
@@ -70,7 +75,7 @@ const AppWrapper = () => {
           // Schedule refresh
           scheduleTokenRefresh(timeToRefresh);
         } catch (error) {
-          console.error("Error getting token:", error);
+          console.error('Error getting token:', error);
         }
       } else {
         // Clear the refresh timer if user is logged out
@@ -96,7 +101,7 @@ const AppWrapper = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        Loading...
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
       </div>
     );
   }
@@ -116,13 +121,19 @@ const AppWrapper = () => {
         <Route path="/about" element={<AboutMe />} />
         <Route path="/admin" element={<AdminPenjualan />} />
         <Route path="/admin/keuangan" element={<AdminKeuangan />} />
+        <Route path="/admin/kelolamenu" element={<AdminKelolaMenu />} />
         <Route path="/cart" element={<ShoppingCart />} />
         <Route path="/checkout" element={<Checkout />} />
+        <Route path="/payment" element={<PaymentRedirect />} />
         <Route path="/payment/:orderId" element={<PaymentPage />} />
+        <Route path="/aboutme" element={<AboutMe />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/history" element={<HistoryPage />} />
+        <Route path="/history/:orderId" element={<HistoryDetailPage />} />   
       </Routes>
     </BrowserRouter>
   );
 };
 
-const root = document.getElementById("root");
+const root = document.getElementById('root');
 ReactDOM.createRoot(root).render(<AppWrapper />);

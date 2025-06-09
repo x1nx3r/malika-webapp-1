@@ -8,9 +8,9 @@ function CategoryNav() {
   ];
 
   return (
-    <div className="w-full px-4 sm:px-6 lg:px-8 my-2 sm:my-4 overflow-x-auto">
+    <nav className="w-full px-4 sm:px-6 lg:px-8 py-1 fixed top-10 left-0 right-0 z-20 bg-white shadow-sm">
       <div className="container mx-auto flex justify-center">
-        <div className="min-w-max bg-[#FC8A06] rounded-[2rem] sm:rounded-[3.69rem] flex items-center px-4 py-3 sm:px-8 sm:h-[5rem] space-x-3 sm:space-x-4 md:space-x-6 lg:justify-between">
+        <div className="min-w-max bg-[#FC8A06] rounded-2xl flex items-center px-2 py-1 space-x-1 sm:space-x-2 overflow-x-auto">
           {categories.map((category, index) => (
             <CategoryButton
               key={index}
@@ -20,16 +20,18 @@ function CategoryNav() {
           ))}
         </div>
       </div>
-    </div>
+    </nav>
   );
 }
 
 function CategoryButton({ name, isActive }) {
   return (
     <div
-      className={`flex-shrink-0 ${isActive ? "bg-[#03081F]" : ""} rounded-full px-4 sm:px-6 py-2 sm:py-3 sm:w-auto md:w-[18.5rem] sm:h-[2.5rem] flex items-center justify-center`}
+      className={`flex-shrink-0 ${
+        isActive ? "bg-[#03081F]" : ""
+      } rounded-full px-3 py-0.5 flex items-center justify-center cursor-pointer hover:opacity-90 transition-opacity`}
     >
-      <div className="text-center text-[#F0F0F0] text-sm sm:text-base md:text-[1.375rem] font-bold font-['Poppins'] whitespace-nowrap">
+      <div className="text-center text-[#F0F0F0] text-xs font-medium whitespace-nowrap">
         {name}
       </div>
     </div>

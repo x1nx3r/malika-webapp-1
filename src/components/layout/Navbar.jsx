@@ -1,86 +1,79 @@
+import { useState } from 'react';
+
 function Navbar() {
+  const [isSearchActive, setIsSearchActive] = useState(false);
+
   return (
-    <header className="w-full px-4 sm:px-6 lg:px-8 my-2 sm:my-4">
-      <div className="container mx-auto bg-[#FAFAFA] rounded-bl-8 sm:rounded-bl-16 rounded-br-8 sm:rounded-br-16 outline outline-2 outline-[#D9D9D9] -outline-offset-2">
-        <div className="flex flex-col md:flex-row items-center justify-between p-4">
-          {/* Logo */}
-          <div className="w-[8rem] sm:w-[10rem] md:w-[12.5rem] h-[3rem] sm:h-[4.375rem] border border-black/22 mb-4 md:mb-0"></div>
+    <header className="w-full px-4 sm:px-6 lg:px-8 py-1 bg-white fixed top-0 left-0 right-0 z-30 shadow-sm">
+      <div className="container mx-auto flex items-center justify-between">
+        {/* Logo */}
+        <div className="flex-shrink-0 w-20 sm:w-24">
+          <img
+            src="https://gevannoyoh.com/thumb-malika/thumb-logo.webp"
+            alt="Kedai Malika Logo"
+            className="h-auto w-full"
+          />
+        </div>
 
-          {/* Search Bar - Hidden on mobile */}
-          <div className="hidden md:flex w-full max-w-[37.5rem] h-[3.75rem] overflow-hidden rounded-full outline outline-1 outline-[#03081F] -outline-offset-[0.5px] items-center justify-center relative mx-4">
-            <div className="text-center text-[#666666] text-lg sm:text-xl font-semibold font-['Poppins']">
-              Search Menu
-            </div>
-            <div className="absolute right-4 w-[1.5rem] h-[1.5rem] overflow-hidden">
-              <div className="w-[1.125rem] h-[1.125rem] m-[0.1875rem] outline outline-[2.5px] outline-[#666666] -outline-offset-[1.25px]"></div>
-            </div>
+        {/* Search Bar - Responsive design */}
+        <div
+          className={`flex-grow mx-4 max-w-xl ${
+            isSearchActive ? 'block' : 'hidden md:block'
+          }`}
+        >
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search Menu"
+              className="w-full py-1 px-4 bg-gray-100 rounded-full text-xs"
+            />
+            <button className="absolute right-2 top-1/2 transform -translate-y-1/2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                fill="#666"
+                viewBox="0 0 16 16"
+              >
+                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
+              </svg>
+            </button>
           </div>
+        </div>
 
-          {/* Mobile Search Icon - Visible only on mobile */}
-          <div className="md:hidden w-[2.5rem] h-[2.5rem] rounded-full flex items-center justify-center bg-gray-100 mb-4">
-            <div className="w-[1.5rem] h-[1.5rem] relative">
-              <div className="w-[1.125rem] h-[1.125rem] m-[0.1875rem] outline outline-[2.5px] outline-[#666666] -outline-offset-[1.25px]"></div>
-            </div>
-          </div>
+        {/* Right Side Icons */}
+        <div className="flex items-center space-x-2">
+          {/* Mobile Search Toggle */}
+          <button
+            className="md:hidden p-1 bg-gray-100 rounded-full"
+            onClick={() => setIsSearchActive(!isSearchActive)}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="14"
+              fill="#666"
+              viewBox="0 0 16 16"
+            >
+              <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
+            </svg>
+          </button>
 
-          {/* Green Navigation Section */}
-          <div className="w-full md:w-auto bg-[#028643] rounded-lg md:rounded-bl-14 md:rounded-br-14 outline outline-2 outline-[#D9D9D9]">
-            <div className="flex justify-between md:justify-start">
-              <NavItem icon={<CartIcon />} label="Keranjang" hasBorder />
-              <NavItem
-                icon={<PaymentIcon />}
-                label="Pembayaran"
-                hasBorder
-                notification
-              />
-              <NavItem icon={<MenuIcon />} label="Menu" />
-            </div>
-          </div>
+          {/* Cart Button */}
+          <button className="p-1 bg-gray-100 rounded-full">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="14"
+              fill="#666"
+              viewBox="0 0 16 16"
+            >
+              <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+            </svg>
+          </button>
         </div>
       </div>
     </header>
-  );
-}
-
-function NavItem({ icon, label, hasBorder, notification }) {
-  return (
-    <div
-      className={`flex-1 md:w-[7.8125rem] py-3 md:py-0 md:h-[6rem] flex items-center justify-center ${hasBorder ? "border-r-2 border-[#D9D9D9]" : ""} relative`}
-    >
-      <div className="flex flex-col items-center">
-        <div className="w-[2rem] sm:w-[2.5rem] h-[2rem] sm:h-[2.5rem] relative overflow-hidden mb-1 sm:mb-2">
-          {icon}
-        </div>
-        <div className="text-center text-white text-xs sm:text-sm font-medium font-['Poppins']">
-          {label}
-        </div>
-      </div>
-      {notification && (
-        <div className="w-[1rem] h-[1rem] sm:w-[1.25rem] sm:h-[1.25rem] absolute top-[-0.5rem] right-2 sm:right-4 bg-[#FC8A06] rounded-full"></div>
-      )}
-    </div>
-  );
-}
-
-function CartIcon() {
-  return (
-    <>
-      <div className="w-[0.3125rem] h-[0.3125rem] absolute left-[0.703rem] top-[1.875rem] bg-[#F0F0F0]"></div>
-      <div className="w-[0.3125rem] h-[0.3125rem] absolute left-[1.797rem] top-[1.875rem] bg-[#F0F0F0]"></div>
-      <div className="w-[2.1rem] h-[1.484rem] absolute left-[0.156rem] top-[0.3125rem] bg-[#F0F0F0]"></div>
-    </>
-  );
-}
-
-function PaymentIcon() {
-  return (
-    <div className="w-full h-[2.344rem] absolute top-[0.156rem] bg-[#F0F0F0]"></div>
-  );
-}
-
-function MenuIcon() {
-  return (
-    <div className="w-[1.75rem] h-[1.25rem] absolute left-[0.688rem] top-[0.938rem] outline outline-4 outline-[#F0F0F0] -outline-offset-2"></div>
   );
 }
 

@@ -1,63 +1,155 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { auth } from "../../../../firebase"; // Make sure this import is correct
 
-function Navbar() {
+function Navbar({ onSearch }) {
   const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isMenuDropdownOpen, setIsMenuDropdownOpen] = useState(false);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (onSearch && searchQuery.trim()) {
+      onSearch(searchQuery);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      console.log("Logging out...");
+      setIsMenuDropdownOpen(false);
+
+      // First sign out from Firebase Auth
+      await auth.signOut();
+
+      // Then call the server logout endpoint to clear cookies
+      const response = await fetch("/api/auth", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ action: "logout" }),
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error("Server logout failed");
+      }
+
+      // Redirect to login page after successful logout
+      navigate("/");
+    } catch (error) {
+      console.error("Error signing out:", error);
+      // Even if there was an error, try to navigate away
+      navigate("/");
+    }
+  };
+
+  const handleProfile = () => {
+    console.log("Navigate to profile");
+    setIsMenuDropdownOpen(false);
+    navigate("/profile"); // Added navigation to profile page
+  };
 
   return (
-    <header className="w-full px-4 sm:px-6 lg:px-8 my-2 sm:my-4">
-      <div className="container mx-auto bg-[#FAFAFA] rounded-bl-8 sm:rounded-bl-16 rounded-br-8 sm:rounded-br-16 outline outline-2 outline-[#D9D9D9] -outline-offset-2">
-        <div className="flex flex-col md:flex-row items-center justify-between p-4">
-          {/* Logo */}
-          <div className="w-[8rem] sm:w-[10rem] md:w-[12.5rem] h-[3rem] sm:h-[4.375rem] border border-black/22 mb-4 md:mb-0"></div>
+    <header className="px-3 w-full flex justify-center">
+      {/* Added container with max width */}
+      <div className="w-full max-w-3xl">
+        <div className="bg-[#FAFAFA] rounded-b-lg border-2 border-[#D9D9D9]">
+          <div className="flex flex-col md:flex-row items-center justify-between p-3">
+            {/* Logo */}
+            <div
+              className="w-32 h-12 border border-black/20 mb-3 md:mb-0 cursor-pointer"
+              onClick={() => navigate("/")}
+            ></div>
 
-          {/* Search Bar - Hidden on mobile */}
-          <div className="hidden md:flex w-full max-w-[37.5rem] h-[3.75rem] overflow-hidden rounded-full outline outline-1 outline-[#03081F] -outline-offset-[0.5px] items-center justify-center relative mx-4">
-            <div className="text-center text-[#666666] text-lg sm:text-xl font-semibold font-['Poppins']">
-              Search Menu
-            </div>
-            <div className="absolute right-8 w-[1.5rem] h-[1.5rem] overflow-hidden">
-              <svg
-                className="w-[1.8rem] h-[1.8rem] m-[-0.1rem]"
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-              >
-                <g fill="none" fillRule="evenodd">
-                  <path d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z" />
-                  <path
-                    fill="#666666"
-                    d="M10.5 2a8.5 8.5 0 1 0 5.262 15.176l3.652 3.652a1 1 0 0 0 1.414-1.414l-3.652-3.652A8.5 8.5 0 0 0 10.5 2M4 10.5a6.5 6.5 0 1 1 13 0a6.5 6.5 0 0 1-13 0"
-                  />
-                </g>
-              </svg>
-            </div>
-          </div>
+            {/* Desktop Search Bar */}
+            <form
+              onSubmit={handleSearch}
+              className="hidden md:block w-full max-w-md mx-4"
+            >
+              <div className="relative h-12">
+                <input
+                  type="text"
+                  placeholder="Search Menu"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full h-full px-4 rounded-full border border-[#03081F] text-base placeholder:text-gray-500"
+                />
+                <button
+                  type="submit"
+                  className="absolute right-4 top-1/2 -translate-y-1/2"
+                  aria-label="Search"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                  >
+                    <g fill="none" fillRule="evenodd">
+                      <path
+                        fill="#666666"
+                        d="M10.5 2a8.5 8.5 0 1 0 5.262 15.176l3.652 3.652a1 1 0 0 0 1.414-1.414l-3.652-3.652A8.5 8.5 0 0 0 10.5 2M4 10.5a6.5 6.5 0 1 1 13 0a6.5 6.5 0 0 1-13 0"
+                      />
+                    </g>
+                  </svg>
+                </button>
+              </div>
+            </form>
 
-          {/* Mobile Search Icon - Visible only on mobile */}
-          <div className="md:hidden w-[2.5rem] h-[2.5rem] rounded-full flex items-center justify-center bg-gray-100 mb-4">
-            <div className="w-[1.5rem] h-[1.5rem] relative">
-              <div className="w-[1.125rem] h-[1.125rem] m-[0.1875rem] outline outline-[2.5px] outline-[#666666] -outline-offset-[1.25px]"></div>
-            </div>
-          </div>
+            {/* Mobile Search Form */}
+            <form onSubmit={handleSearch} className="md:hidden w-full mb-3">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search Menu"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full h-10 px-3 py-2 rounded-full border border-[#03081F] text-sm"
+                />
+                <button
+                  type="submit"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-gray-100 w-7 h-7 flex items-center justify-center rounded-full"
+                >
+                  <svg
+                    className="w-4 h-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                  >
+                    <g fill="none" fillRule="evenodd">
+                      <path
+                        fill="#666666"
+                        d="M10.5 2a8.5 8.5 0 1 0 5.262 15.176l3.652 3.652a1 1 0 0 0 1.414-1.414l-3.652-3.652A8.5 8.5 0 0 0 10.5 2M4 10.5a6.5 6.5 0 1 1 13 0a6.5 6.5 0 0 1-13 0"
+                      />
+                    </g>
+                  </svg>
+                </button>
+              </div>
+            </form>
 
-          {/* Green Navigation Section */}
-          <div className="w-full md:w-auto bg-[#028643] rounded-lg md:rounded-bl-14 md:rounded-br-14 outline outline-2 outline-[#D9D9D9]">
-            <div className="flex justify-between md:justify-start">
-              <NavItem
-                icon={<CartIcon />}
-                label="Keranjang"
-                hasBorder
-                onClick={() => navigate("/cart")}
-              />
-              <NavItem
-                icon={<PaymentIcon />}
-                label="Pembayaran"
-                hasBorder
-                notification
-                onClick={() => navigate("/checkout")}
-              />
-              <NavItem icon={<MenuIcon />} label="Menu" />
+            {/* Navigation Section */}
+            <div className="w-full md:w-auto bg-[#028643] rounded-lg border-2 border-[#D9D9D9]">
+              <div className="flex justify-between md:justify-start">
+                <NavItem
+                  icon={<CartIcon />}
+                  label="Keranjang"
+                  hasBorder
+                  onClick={() => navigate("/cart")}
+                />
+                <NavItem
+                  icon={<PaymentIcon />}
+                  label="Pembayaran"
+                  hasBorder
+                  notification
+                  onClick={() => navigate("/payment")}
+                />
+                <MenuNavItem
+                  isDropdownOpen={isMenuDropdownOpen}
+                  setIsDropdownOpen={setIsMenuDropdownOpen}
+                  onProfile={handleProfile}
+                  onLogout={handleLogout}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -70,40 +162,113 @@ function NavItem({ icon, label, hasBorder, notification, onClick }) {
   return (
     <div
       onClick={onClick}
-      className={`flex-1 md:w-[7.8125rem] py-3 md:py-0 md:h-[6rem] flex items-center justify-center
+      className={`flex-1 md:w-24 py-2 md:h-16 flex items-center justify-center
         ${hasBorder ? "border-r-2 border-[#D9D9D9]" : ""}
         relative cursor-pointer hover:bg-green-800 transition-colors`}
     >
       <div className="flex flex-col items-center">
-        <div className="w-[2rem] sm:w-[2.5rem] h-[2rem] sm:h-[2.5rem] relative overflow-hidden mb-1 sm:mb-2">
-          {icon}
-        </div>
-        <div className="text-center text-white text-xs sm:text-sm font-medium font-['Poppins']">
+        <div className="w-6 h-6 sm:w-7 sm:h-7 relative mb-1">{icon}</div>
+        <div className="text-center text-white text-xs font-medium">
           {label}
         </div>
       </div>
       {notification && (
-        <div className="w-[1rem] h-[1rem] sm:w-[1.25rem] sm:h-[1.25rem] absolute top-[-0.5rem] right-2 sm:right-4 bg-[#FC8A06] rounded-full"></div>
+        <div className="w-3 h-3 absolute top-0 right-2 bg-[#FC8A06] rounded-full"></div>
       )}
     </div>
   );
 }
 
+function MenuNavItem({
+  isDropdownOpen,
+  setIsDropdownOpen,
+  onProfile,
+  onLogout,
+}) {
+  return (
+    <div className="relative flex-1 md:w-24">
+      <div
+        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+        className="py-2 md:h-16 flex items-center justify-center cursor-pointer hover:bg-green-800 transition-colors"
+      >
+        <div className="flex flex-col items-center">
+          <div className="w-6 h-6 sm:w-7 sm:h-7 relative mb-1">
+            <MenuIcon />
+          </div>
+          <div className="text-center text-white text-xs font-medium">Menu</div>
+        </div>
+      </div>
+
+      {/* Dropdown Menu */}
+      {isDropdownOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-40"
+            onClick={() => setIsDropdownOpen(false)}
+          />
+
+          <div className="absolute right-0 top-full mt-1 w-40 bg-white rounded shadow-md py-1 border border-gray-200 z-50">
+            <button
+              className="flex items-center w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              onClick={onProfile}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                fill="currentColor"
+                className="mr-2"
+                viewBox="0 0 16 16"
+              >
+                <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z" />
+              </svg>
+              Profile
+            </button>
+
+            <hr className="border-gray-200" />
+
+            <button
+              className="flex items-center w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50"
+              onClick={onLogout}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                fill="currentColor"
+                className="mr-2"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"
+                />
+                <path
+                  fillRule="evenodd"
+                  d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"
+                />
+              </svg>
+              Logout
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// Icon components simplified
 function CartIcon() {
   return (
     <svg
-      className="w-[2.95rem] h-[2.95rem] m-[-0.15rem]"
       xmlns="http://www.w3.org/2000/svg"
-      width="50"
-      height="50"
       viewBox="0 0 512 512"
+      className="w-full h-full text-white"
+      fill="currentColor"
     >
-      <circle cx="176" cy="416" r="32" fill="#F0F0F0" />
-      <circle cx="400" cy="416" r="32" fill="#F0F0F0" />
-      <path
-        fill="#F0F0F0"
-        d="M456.8 120.78a23.92 23.92 0 0 0-18.56-8.78H133.89l-6.13-34.78A16 16 0 0 0 112 64H48a16 16 0 0 0 0 32h50.58l45.66 258.78A16 16 0 0 0 160 368h256a16 16 0 0 0 0-32H173.42l-5.64-32h241.66A24.07 24.07 0 0 0 433 284.71l28.8-144a24 24 0 0 0-5-19.93"
-      />
+      <circle cx="176" cy="416" r="32" />
+      <circle cx="400" cy="416" r="32" />
+      <path d="M456.8 120.78a23.92 23.92 0 0 0-18.56-8.78H133.89l-6.13-34.78A16 16 0 0 0 112 64H48a16 16 0 0 0 0 32h50.58l45.66 258.78A16 16 0 0 0 160 368h256a16 16 0 0 0 0-32H173.42l-5.64-32h241.66A24.07 24.07 0 0 0 433 284.71l28.8-144a24 24 0 0 0-5-19.93" />
     </svg>
   );
 }
@@ -111,16 +276,12 @@ function CartIcon() {
 function PaymentIcon() {
   return (
     <svg
-      className="w-[2.5rem] h-[2.5rem]"
       xmlns="http://www.w3.org/2000/svg"
-      width="50"
-      height="50"
       viewBox="0 0 512 512"
+      className="w-full h-full text-white"
+      fill="currentColor"
     >
-      <path
-        fill="#F0F0F0"
-        d="M0 64c0-17.7 14.3-32 32-32h80c79.5 0 144 64.5 144 144c0 58.8-35.2 109.3-85.7 131.7l51.4 128.4c6.6 16.4-1.4 35-17.8 41.6s-35-1.4-41.6-17.8l-56-139.9H64v128c0 17.7-14.3 32-32 32S0 465.7 0 448zm64 192h48c44.2 0 80-35.8 80-80s-35.8-80-80-80H64zm256-96h80c61.9 0 112 50.1 112 112s-50.1 112-112 112h-48v96c0 17.7-14.3 32-32 32s-32-14.3-32-32V192c0-17.7 14.3-32 32-32m80 160c26.5 0 48-21.5 48-48s-21.5-48-48-48h-48v96z"
-      />
+      <path d="M0 64c0-17.7 14.3-32 32-32h80c79.5 0 144 64.5 144 144c0 58.8-35.2 109.3-85.7 131.7l51.4 128.4c6.6 16.4-1.4 35-17.8 41.6s-35-1.4-41.6-17.8l-56-139.9H64v128c0 17.7-14.3 32-32 32S0 465.7 0 448zm64 192h48c44.2 0 80-35.8 80-80s-35.8-80-80-80H64zm256-96h80c61.9 0 112 50.1 112 112s-50.1 112-112 112h-48v96c0 17.7-14.3 32-32 32s-32-14.3-32-32V192c0-17.7 14.3-32 32-32m80 160c26.5 0 48-21.5 48-48s-21.5-48-48-48h-48v96z" />
     </svg>
   );
 }
@@ -128,16 +289,12 @@ function PaymentIcon() {
 function MenuIcon() {
   return (
     <svg
-      className="w-[2.85rem] h-[2.85rem] m-[-0.1rem]"
       xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
       viewBox="0 0 24 24"
+      className="w-full h-full text-white"
+      fill="currentColor"
     >
-      <path
-        fill="#F0F0F0"
-        d="M4 18q-.425 0-.712-.288T3 17t.288-.712T4 16h16q.425 0 .713.288T21 17t-.288.713T20 18zm0-5q-.425 0-.712-.288T3 12t.288-.712T4 11h16q.425 0 .713.288T21 12t-.288.713T20 13zm0-5q-.425 0-.712-.288T3 7t.288-.712T4 6h16q.425 0 .713.288T21 7t-.288.713T20 8z"
-      />
+      <path d="M4 18q-.425 0-.712-.288T3 17t.288-.712T4 16h16q.425 0 .713.288T21 17t-.288.713T20 18zm0-5q-.425 0-.712-.288T3 12t.288-.712T4 11h16q.425 0 .713.288T21 12t-.288.713T20 13zm0-5q-.425 0-.712-.288T3 7t.288-.712T4 6h16q.425 0 .713.288T21 7t-.288.713T20 8z" />
     </svg>
   );
 }

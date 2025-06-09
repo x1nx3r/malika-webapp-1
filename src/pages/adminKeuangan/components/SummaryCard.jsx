@@ -15,10 +15,10 @@ export default function SummaryCard({ data, showOrderDetails }) {
   };
 
   return (
-    <div className="w-full bg-orange-500 rounded-xl mb-8 shadow-lg">
+    <div className="w-full bg-orange-500 rounded-3xl mb-8 shadow-lg">
       <div className="grid grid-cols-1 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-white">
         {/* Month/Year or Customer Info */}
-        <div className="p-6 flex flex-col items-center justify-center bg-white rounded-t-xl md:rounded-tr-none md:rounded-l-xl">
+        <div className="p-6 flex flex-col items-center justify-center bg-white rounded-t-3xl md:rounded-tr-none md:rounded-l-3xl">
           {showOrderDetails && orderDetails ? (
             <>
               <div className="text-2xl md:text-3xl font-medium text-orange-500">
@@ -64,7 +64,7 @@ export default function SummaryCard({ data, showOrderDetails }) {
         </div>
 
         {/* Cancelled Orders or Order Date */}
-        <div className="p-6 flex flex-col items-center justify-center bg-orange-600 rounded-b-xl md:rounded-bl-none md:rounded-r-xl">
+        <div className="p-6 flex flex-col items-center justify-center bg-orange-600 rounded-b-3xl md:rounded-bl-none md:rounded-r-3xl">
           {showOrderDetails && orderDetails ? (
             <>
               <div className="text-2xl md:text-3xl font-light text-white">

@@ -56,7 +56,12 @@ export default async function handler(req, res) {
     // Verify authentication
     const decodedToken = await admin.auth().verifyIdToken(token);
     const userId = decodedToken.uid;
-    const isAdmin = decodedToken.admin === true;
+    // const isAdmin = decodedToken.admin === true;
+
+    const userDoc = await db.collection("users").doc(userId).get();
+    const userRole = userDoc.exists ? userDoc.data().role : "user";
+    const isAdmin = userRole === "admin";
+    
     console.log("Authenticated userId:", userId, "isAdmin:", isAdmin);
 
     // Extract orderId from both path and query parameters
@@ -105,70 +110,82 @@ export default async function handler(req, res) {
 // CREATE - Handler for creating new orders
 async function handleCreateOrder(req, res, userId) {
   // Get the request body
-  const orderData =
-    typeof req.body === "object" ? req.body : JSON.parse(req.body);
+  const orderData = typeof req.body === 'object' ? req.body : JSON.parse(req.body);
 
   // Validate order data
-  if (
-    !orderData.items ||
-    !Array.isArray(orderData.items) ||
-    orderData.items.length === 0
-  ) {
-    return res.status(400).json({ error: "Order must contain items" });
+  if (!orderData.items || !Array.isArray(orderData.items) || orderData.items.length === 0) {
+    return res.status(400).json({ error: 'Order must contain items' });
   }
 
-  if (
-    !orderData.receiverInfo ||
-    !orderData.receiverInfo.name ||
-    !orderData.receiverInfo.phone ||
-    !orderData.receiverInfo.address
-  ) {
-    return res
-      .status(400)
-      .json({ error: "Receiver information is incomplete" });
+  if (!orderData.receiverInfo || !orderData.receiverInfo.name || !orderData.receiverInfo.phone || !orderData.receiverInfo.address) {
+    return res.status(400).json({ error: 'Receiver information is incomplete' });
   }
 
-  // Calculate order totals to ensure accuracy
-  const subtotal = orderData.items.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0,
-  );
-
-  const downPaymentAmount = Math.round(
-    subtotal * (orderData.paymentInfo.downPaymentPercent / 100),
-  );
+  // Calculate order totals
+  const subtotal = orderData.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const downPaymentAmount = Math.round(subtotal * (orderData.paymentInfo.downPaymentPercent / 100));
   const remainingPayment = subtotal - downPaymentAmount;
 
-  // Create a new order
+  // Convert UTC date to WIB (UTC+7)
+  let deliveryDate = null;
+  if (orderData.deliveryInfo.date) {
+    const utcDate = new Date(orderData.deliveryInfo.date);
+    // Add 7 hours to convert UTC to WIB
+    deliveryDate = new Date(utcDate.getTime() + 7 * 60 * 60 * 1000).toISOString();
+  }
+
+  // Create a new order with the specified format
   const orderRef = await ordersCollection.add({
     userId,
-    items: orderData.items,
-    receiverInfo: orderData.receiverInfo,
-    deliveryInfo: orderData.deliveryInfo,
+    items: orderData.items.map(item => ({
+      id: item.id,
+      name: item.name,
+      category: item.category,
+      imageUrl: item.imageUrl,
+      kemasan: item.kemasan,
+      price: item.price,
+      quantity: item.quantity
+    })),
+    receiverInfo: {
+      name: orderData.receiverInfo.name,
+      phone: orderData.receiverInfo.phone,
+      address: orderData.receiverInfo.address
+    },
+    deliveryInfo: {
+      date: deliveryDate,
+      time: orderData.deliveryInfo.time,
+      notes: orderData.deliveryInfo.notes || ''
+    },
     paymentInfo: {
       downPaymentPercent: orderData.paymentInfo.downPaymentPercent,
       downPaymentAmount: downPaymentAmount,
-      subtotal: subtotal,
       remainingPayment: remainingPayment,
+      subtotal: subtotal,
+      shipingCost: 0,
+      total: subtotal,
+      statusDownPayment: 'pending',
+      proofDownPayment: '',
+      statusRemainingPayment: 'pending',
+      proofRemainingPayment: '',
     },
-    status: "pending",
+    status: 'pending',
     createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    updatedAt: admin.firestore.FieldValue.serverTimestamp()
   });
-
-  console.log("Created order with ID:", orderRef.id);
 
   // Clear the user's cart after successful order creation
   const cartRef = cartsCollection.doc(userId);
   await cartRef.set({ items: [] });
-  console.log("Cleared cart for user:", userId);
 
   // Return the order details
   return res.status(201).json({
     orderId: orderRef.id,
-    status: "pending",
-    subtotal: subtotal,
-    downPaymentAmount: downPaymentAmount,
-    remainingPayment: remainingPayment,
+    status: 'pending',
+    paymentInfo: {
+      downPaymentAmount: downPaymentAmount,
+      remainingPayment: remainingPayment,
+      subtotal: subtotal
+    }
   });
 }
 
