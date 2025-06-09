@@ -1,6 +1,6 @@
 function ProductCard({ product, onAddToCart, isLoading }) {
   return (
-    <div className="w-full sm:w-[20rem] md:w-[32.94rem] h-auto md:h-[15.625rem] bg-white shadow-xl rounded-[0.75rem] sm:rounded-[1rem] flex flex-col md:flex-row overflow-hidden">
+    <div className="w-full sm:w-[20rem] md:w-[32.94rem] h-auto md:h-[15.625rem] bg-white rounded-[0.75rem] sm:rounded-[1rem] md:rounded-[1rem] flex flex-col md:flex-row overflow-hidden custom-shadow">
       <div className="p-4 sm:py-6 sm:pl-6 sm:pr-0 flex flex-col justify-between flex-1">
         <div>
           <div className="mb-4">
@@ -16,7 +16,7 @@ function ProductCard({ product, onAddToCart, isLoading }) {
           </div>
         </div>
         <div className="text-[#0E0E0E] text-lg sm:text-2xl font-bold font-['Poppins'] mt-4 md:mt-0">
-          Rp{product.price.toLocaleString("id-ID")},-
+          Rp{product.price.toLocaleString('id-ID')},-
         </div>
       </div>
 
@@ -32,8 +32,8 @@ function ProductCard({ product, onAddToCart, isLoading }) {
           className={`w-[3rem] h-[3rem] sm:w-[3.75rem] sm:h-[3.75rem] absolute bottom-3 right-3 md:bottom-6 md:right-6
             ${
               isLoading
-                ? "bg-gray-300 cursor-not-allowed"
-                : "bg-white/80 hover:bg-white/90 active:bg-white/100"
+                ? 'bg-gray-300 cursor-not-allowed'
+                : 'bg-white/80 hover:bg-white/90 active:bg-white/100'
             }
             transition-all rounded-tl-[1.25rem] sm:rounded-tl-[1.625rem] rounded-br-[0.5rem] sm:rounded-br-[0.75rem]
             flex items-center justify-center`}
@@ -56,6 +56,12 @@ function ProductCard({ product, onAddToCart, isLoading }) {
           )}
         </button>
       </div>
+
+      <style jsx>{`
+        .custom-shadow {
+          box-shadow: 5px 5px 34px 0px rgba(0, 0, 0, 0.25);
+        }
+      `}</style>
     </div>
   );
 }

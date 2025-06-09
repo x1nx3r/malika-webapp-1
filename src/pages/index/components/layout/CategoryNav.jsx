@@ -6,14 +6,14 @@ function CategoryButton({ name, isActive, onClick }) {
     <button
       onClick={() => onClick(name)}
       className={`
-        flex-shrink-0 rounded-full px-4 sm:px-6 py-2 sm:py-3 
+        flex-1 rounded-full px-2 sm:px-3 md:px-4 py-2 sm:py-2.5 
         transition-all duration-300 transform hover:scale-105
         ${
           isActive
-            ? 'bg-white text-[#FC8A06] shadow-lg font-bold'
-            : 'text-[#F0F0F0] hover:bg-white/20 font-semibold'
+            ? 'bg-black text-white shadow-lg font-bold'
+            : 'text-white hover:bg-white/20 font-medium'
         }
-        text-sm sm:text-base md:text-lg whitespace-nowrap
+        text-xs sm:text-sm md:text-base whitespace-nowrap mx-1
       `}
     >
       {name}
@@ -21,9 +21,12 @@ function CategoryButton({ name, isActive, onClick }) {
   );
 }
 
-function CategoryNav({ onCategoryClick, activeCategory: externalActiveCategory }) {
+function CategoryNav({
+  onCategoryClick,
+  activeCategory: externalActiveCategory,
+}) {
   const [localActiveCategory, setLocalActiveCategory] = useState('Rekomendasi');
-  
+
   // Sync local state with external state if provided
   useEffect(() => {
     if (externalActiveCategory) {
@@ -43,13 +46,13 @@ function CategoryNav({ onCategoryClick, activeCategory: externalActiveCategory }
     setLocalActiveCategory(categoryName);
     if (onCategoryClick) {
       onCategoryClick(categoryName);
-    }
+    } 
   };
 
   return (
-    <div className="w-full px-4 sm:px-6 lg:px-8 my-4 overflow-x-auto custom-scrollbar">
+    <div className="w-full px-2 sm:px-4 lg:px-6 my-1 overflow-x-auto custom-scrollbar">
       <div className="container mx-auto flex justify-center">
-        <div className="min-w-max bg-gradient-to-r from-[#FC8A06] to-[#FF6B35] rounded-[2rem] sm:rounded-[3.69rem] flex items-center px-6 py-4 sm:px-8 sm:h-[5rem] space-x-3 sm:space-x-4 md:space-x-6 shadow-lg">
+        <div className="w-full max-w-6xl bg-gradient-to-r from-[#FC8A06] to-[#FF6B35] rounded-full flex items-center justify-center px-4 sm:px-6 py-3 sm:py-3.5 h-[3rem] sm:h-[3.5rem] space-x-2 sm:space-x-3 md:space-x-4 lg:space-x-6 shadow-lg">
           {categories.map((category, index) => (
             <CategoryButton
               key={index}
@@ -68,7 +71,7 @@ function CategoryNav({ onCategoryClick, activeCategory: externalActiveCategory }
           background: #f1f1f1;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #FC8A06;
+          background: #fc8a06;
           border-radius: 10px;
         }
       `}</style>

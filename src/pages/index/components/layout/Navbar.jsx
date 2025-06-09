@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 function Navbar({ onSearch }) {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  const [isMenuDropdownOpen, setIsMenuDropdownOpen] = useState(false);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -12,8 +13,27 @@ function Navbar({ onSearch }) {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      console.log('Logging out...');
+      setIsMenuDropdownOpen(false);
+      // Add your logout logic here
+      // Example: await signOut(auth);
+      // window.location.href = '/login';
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
+  const handleProfile = () => {
+    console.log('Navigate to profile');
+    setIsMenuDropdownOpen(false);
+    // Add your profile navigation logic here
+    // navigate('/profile');
+  };
+
   return (
-    <header className="w-full px-4 sm:px-6 lg:px-8 my-2 sm:my-4">
+    <header className="w-full px-4 sm:px-6 lg:px-8">
       <div className="container mx-auto bg-[#FAFAFA] rounded-bl-8 sm:rounded-bl-16 rounded-br-8 sm:rounded-br-16 outline outline-2 outline-[#D9D9D9] -outline-offset-2">
         <div className="flex flex-col md:flex-row items-center justify-between p-4">
           {/* Logo */}
@@ -48,7 +68,6 @@ function Navbar({ onSearch }) {
                   viewBox="0 0 24 24"
                 >
                   <g fill="none" fillRule="evenodd">
-                    <path d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z" />
                     <path
                       fill="#666666"
                       d="M10.5 2a8.5 8.5 0 1 0 5.262 15.176l3.652 3.652a1 1 0 0 0 1.414-1.414l-3.652-3.652A8.5 8.5 0 0 0 10.5 2M4 10.5a6.5 6.5 0 1 1 13 0a6.5 6.5 0 0 1-13 0"
@@ -90,7 +109,7 @@ function Navbar({ onSearch }) {
           </form>
 
           {/* Green Navigation Section */}
-          <div className="w-full md:w-auto bg-[#028643] rounded-lg md:rounded-bl-14 md:rounded-br-14 outline outline-2 outline-[#D9D9D9]">
+          <div className="w-full md:w-auto bg-[#028643] rounded-lg md:rounded-bl-14 md:rounded-br-14 outline outline-2 outline-[#D9D9D9] relative">
             <div className="flex justify-between md:justify-start">
               <NavItem
                 icon={<CartIcon />}
@@ -105,7 +124,12 @@ function Navbar({ onSearch }) {
                 notification
                 onClick={() => navigate('/payment')}
               />
-              <NavItem icon={<MenuIcon />} label="Menu" />
+              <MenuNavItem 
+                isDropdownOpen={isMenuDropdownOpen}
+                setIsDropdownOpen={setIsMenuDropdownOpen}
+                onProfile={handleProfile}
+                onLogout={handleLogout}
+              />
             </div>
           </div>
         </div>
@@ -132,6 +156,79 @@ function NavItem({ icon, label, hasBorder, notification, onClick }) {
       </div>
       {notification && (
         <div className="w-[1rem] h-[1rem] sm:w-[1.25rem] sm:h-[1.25rem] absolute top-[-0.5rem] right-2 sm:right-4 bg-[#FC8A06] rounded-full"></div>
+      )}
+    </div>
+  );
+}
+
+function MenuNavItem({ isDropdownOpen, setIsDropdownOpen, onProfile, onLogout }) {
+  return (
+    <div className="relative flex-1 md:w-[7.8125rem]">
+      <div
+        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+        className="py-3 md:py-0 md:h-[6rem] flex items-center justify-center cursor-pointer hover:bg-green-800 transition-colors"
+      >
+        <div className="flex flex-col items-center">
+          <div className="w-[2rem] sm:w-[2.5rem] h-[2rem] sm:h-[2.5rem] relative overflow-hidden mb-1 sm:mb-2">
+            <MenuIcon />
+          </div>
+          <div className="text-center text-white text-xs sm:text-sm font-medium font-['Poppins']">
+            Menu
+          </div>
+        </div>
+      </div>
+      
+      {/* Dropdown Menu */}
+      {isDropdownOpen && (
+        <>
+          {/* Overlay to close dropdown when clicking outside */}
+          <div
+            className="fixed inset-0 z-40"
+            onClick={() => setIsDropdownOpen(false)}
+          />
+          
+          {/* Dropdown Content */}
+          <div 
+            className="absolute right-0 top-full mt-2 w-48 bg-white rounded-md shadow-xl py-1 border border-gray-200 z-50"
+          >
+            <button
+              className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+              onClick={onProfile}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="currentColor"
+                className="mr-3"
+                viewBox="0 0 16 16"
+              >
+                <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+              </svg>
+              Profile
+            </button>
+            
+            <hr className="border-gray-200" />
+            
+            <button
+              className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+              onClick={onLogout}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="currentColor"
+                className="mr-3"
+                viewBox="0 0 16 16"
+              >
+                <path fillRule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/>
+                <path fillRule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
+              </svg>
+              Logout
+            </button>
+          </div>
+        </>
       )}
     </div>
   );

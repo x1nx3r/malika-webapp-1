@@ -28,7 +28,7 @@ const AppWrapper = () => {
   const refreshToken = async () => {
     try {
       if (auth.currentUser) {
-        console.log("Refreshing auth token...");
+        console.log('Refreshing auth token...');
         const token = await auth.currentUser.getIdToken(true); // Force refresh
         document.cookie = `firebaseToken=${token}; path=/; max-age=3600`; // 1 hour
 
@@ -36,7 +36,7 @@ const AppWrapper = () => {
         scheduleTokenRefresh(55 * 60 * 1000); // 55 minutes
       }
     } catch (error) {
-      console.error("Error refreshing token:", error);
+      console.error('Error refreshing token:', error);
       // If refresh fails, try again in 1 minute
       scheduleTokenRefresh(60 * 1000);
     }
@@ -52,7 +52,7 @@ const AppWrapper = () => {
     // Set new timer
     tokenRefreshTimer.current = setTimeout(refreshToken, delay);
     console.log(
-      `Token refresh scheduled in ${Math.round(delay / 60000)} minutes`,
+      `Token refresh scheduled in ${Math.round(delay / 60000)} minutes`
     );
   };
 
@@ -75,7 +75,7 @@ const AppWrapper = () => {
           // Schedule refresh
           scheduleTokenRefresh(timeToRefresh);
         } catch (error) {
-          console.error("Error getting token:", error);
+          console.error('Error getting token:', error);
         }
       } else {
         // Clear the refresh timer if user is logged out
@@ -126,13 +126,14 @@ const AppWrapper = () => {
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/payment" element={<PaymentRedirect />} />
         <Route path="/payment/:orderId" element={<PaymentPage />} />
+        <Route path="/aboutme" element={<AboutMe />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/history" element={<HistoryPage />} />
-        <Route path="/history/:orderId" element={<HistoryDetailPage />} />
+        <Route path="/history/:orderId" element={<HistoryDetailPage />} />   
       </Routes>
     </BrowserRouter>
   );
 };
 
-const root = document.getElementById("root");
+const root = document.getElementById('root');
 ReactDOM.createRoot(root).render(<AppWrapper />);
