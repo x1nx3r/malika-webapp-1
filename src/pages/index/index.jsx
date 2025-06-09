@@ -229,8 +229,8 @@ function Index() {
           transform: 'scale(0.8)',
           width: '125%',
           marginLeft: '-12.5%',
-          marginBottom: '-30%', // Increased to -30% for better removal of whitespace
-          minHeight: 'fit-content', // Ensure it fits content properly
+          marginBottom: '-100%', // Increased from -30% to -40% to remove more whitespace
+          minHeight: 'fit-content',
         }}
       >
         {/* Hero Banner - only show when not searching */}
