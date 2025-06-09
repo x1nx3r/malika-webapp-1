@@ -1,4 +1,8 @@
+import { useNavigate } from "react-router-dom"
+
 function HistoryCard({ order }) {
+    const navigate = useNavigate();
+
     const formatDate = (timestamp) => {
         if (!timestamp) return "-";
         
@@ -121,6 +125,7 @@ function HistoryCard({ order }) {
                         <span className="text-2xl font-poppins font-bold text-orange-500 cursor-default">Rp{formatPrice(getTotalPrice())}</span>
                     </div>
                     <button
+                        onClick={() => navigate(`/history/${order.id}`)}
                         className="bg-green-700 px-5 py-2 text-white text-sm font-poppins font-medium rounded-lg cursor-pointer hover:bg-green-800 transition-all duration-200 ease-in"
                     >
                         <span>Detail</span>
@@ -128,61 +133,6 @@ function HistoryCard({ order }) {
                 </div>
             </div>
         </div>
-
-
-
-        // <div className="bg-white rounded-lg shadow-md p-4">
-        //     <div className="flex justify-between items-start mb-2">
-        //         <div>
-        //             <h3 className="font-semibold text-lg">
-        //                 Order ID: {order.id ? order.id.substring(0, 8) + '...' : 'N/A'}
-        //             </h3>
-        //             <p className="text-gray-600 text-sm">
-        //                 {formatDate(order.updatedAt || order.createdAt)}
-        //             </p>
-        //         </div>
-        //         <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-        //             order.displayStatus === "Pesanan Selesai" ? "bg-green-100 text-green-800" :
-        //             order.displayStatus === "Sedang Diproses" || 
-        //             order.displayStatus === "Dalam Pengiriman" || 
-        //             order.displayStatus === "Pesanan Diterima" || 
-        //             order.displayStatus === "Pesanan Lunas" ? "bg-blue-100 text-blue-800" :
-        //             order.displayStatus === "Dibatalkan" ? "bg-red-100 text-red-800" :
-        //             "bg-yellow-100 text-yellow-800" // Untuk "Dalam Konfirmasi"
-        //         }`}>
-        //             {order.displayStatus || "Status tidak diketahui"}
-        //         </span>
-        //     </div>
-
-        //     <div className="border-t border-gray-200 my-3"></div>
-
-        //     <div className="mb-3">
-        //         <h4 className="font-medium mb-1">Items:</h4>
-        //         {items.length > 0 ? (
-        //             <ul className="space-y-1">
-        //                 {items.map((item, index) => (
-        //                     <li key={index} className="flex justify-between">
-        //                         <span>
-        //                             {item.quantity || 0}x {item.name || 'Item tidak diketahui'}
-        //                         </span>
-        //                         <span>
-        //                             Rp{formatPrice(item.price)}
-        //                         </span>
-        //                     </li>
-        //                 ))}
-        //             </ul>
-        //         ) : (
-        //             <p className="text-gray-500 text-sm">Tidak ada item</p>
-        //         )}
-        //     </div>
-
-        //     <div className="border-t border-gray-200 my-3"></div>
-
-        //     <div className="flex justify-between font-medium">
-        //         <span>Total ({calculateTotalItems(items)} items):</span>
-        //         <span>Rp{formatPrice(getTotalPrice())}</span>
-        //     </div>
-        // </div>
     );
 }
 
