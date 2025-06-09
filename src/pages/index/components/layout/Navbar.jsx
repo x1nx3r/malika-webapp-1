@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { auth } from "../../../../firebase"; // Make sure this import is correct
 
 function Navbar({ onSearch }) {
   const navigate = useNavigate();
@@ -17,16 +18,37 @@ function Navbar({ onSearch }) {
     try {
       console.log("Logging out...");
       setIsMenuDropdownOpen(false);
-      // Add your logout logic here
+
+      // First sign out from Firebase Auth
+      await auth.signOut();
+
+      // Then call the server logout endpoint to clear cookies
+      const response = await fetch("/api/auth", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ action: "logout" }),
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error("Server logout failed");
+      }
+
+      // Redirect to login page after successful logout
+      navigate("/");
     } catch (error) {
       console.error("Error signing out:", error);
+      // Even if there was an error, try to navigate away
+      navigate("/");
     }
   };
 
   const handleProfile = () => {
     console.log("Navigate to profile");
     setIsMenuDropdownOpen(false);
-    // Add your profile navigation logic here
+    navigate("/profile"); // Added navigation to profile page
   };
 
   return (
