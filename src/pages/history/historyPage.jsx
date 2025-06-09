@@ -145,8 +145,11 @@ function HistoryPage() {
             
             <div className="mt-40 px-4">
                 {loading ? (
-                    <div className="flex justify-center items-center h-40">
-                        <p>Memuat data...</p>
+                    <div className="pt-50 flex flex-col items-center gap-3">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500"></div>
+                        <div className="text-base font-medium text-gray-700">
+                            Sedang memuat...
+                        </div>
                     </div>
                 ) : orders.length === 0 ? (
                     <div className="flex justify-center items-center h-40">
