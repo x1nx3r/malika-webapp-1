@@ -5,6 +5,7 @@ import Swal from 'sweetalert2';
 export default function OrderSummary({ order, onStatusChange }) {
   const [tempShippingCost, setTempShippingCost] = useState(''); // Untuk input sementara
   const [isUpdatingShipping, setIsUpdatingShipping] = useState(false);
+  const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
 
   if (!order) return null;
 
@@ -16,9 +17,52 @@ export default function OrderSummary({ order, onStatusChange }) {
     );
   };
 
+  // Function to calculate remainingPayment
+  const calculateRemainingPayment = () => {
+    // Jika sudah ada nilai remainingPaymentAmount, gunakan itu
+    if (order.paymentInfo?.remainingPaymentAmount) {
+      return order.paymentInfo.remainingPaymentAmount;
+    }
+    
+    // Hitung dari subtotal dikurangi DP ditambah ongkir (jika ada)
+    const subtotal = order.paymentInfo?.subtotal || 0;
+    const downPayment = order.paymentInfo?.downPaymentAmount || 
+      (order.paymentInfo?.downPaymentPercent 
+        ? Math.floor(subtotal * (order.paymentInfo.downPaymentPercent / 100)) 
+        : 0);
+    const shippingCost = order.paymentInfo?.shipingCost || 0;
+    
+    return (subtotal - downPayment) + shippingCost;
+  };
+
+  const formatCurrency = (value) => {
+    if (!value) return '';
+    return `Rp ${Number(value).toLocaleString('id-ID')}`;
+  };
+
+  const parseCurrency = (value) => {
+    return value.replace(/[^0-9]/g, '');
+  };
+
+  // Fungsi untuk mengecek status order apakah pernah paid?
+  const hasBeenPaid = () => {
+    return order.statusHistory?.some(entry => entry.to === 'paid') || order.status === 'paid';
+  };
+
+  // Fungsi untuk mengecek apakah pesanan sudah dikirim (status delivery atau arrived)
+  const hasBeenDelivered = () => {
+    return order.statusHistory?.some(entry => entry.to === 'delivery' || entry.to === 'arrived') || 
+          ['delivery', 'arrived'].includes(order.status);
+  };
+
+  const toggleNoteModal = () => {
+    setIsNoteModalOpen(!isNoteModalOpen);
+  };
+
   // Fungsi untuk menyimpan ongkos kirim
   const saveShippingCost = async () => {
-    if (!tempShippingCost || isNaN(tempShippingCost)) {
+    const numericValue = parseCurrency(tempShippingCost);
+    if (!numericValue || isNaN(numericValue)) {
       Swal.fire('Error!', 'Masukkan nominal ongkos kirim yang valid', 'error');
       return;
     }
@@ -26,7 +70,7 @@ export default function OrderSummary({ order, onStatusChange }) {
     try {
       setIsUpdatingShipping(true);
       await onStatusChange(order.id, 'update_shipping', { 
-        shipingCost: Number(tempShippingCost) 
+        shipingCost: Number(numericValue) 
       });
       Swal.fire('Berhasil!', 'Ongkos kirim berhasil diperbarui', 'success');
       setTempShippingCost(''); // Kosongkan input setelah berhasil disimpan
@@ -82,11 +126,6 @@ export default function OrderSummary({ order, onStatusChange }) {
     if (result.isConfirmed) {
       try {
         await onStatusChange(order.id, 'dp_verified');
-        Swal.fire(
-          'Berhasil!',
-          'Pembayaran DP telah dikonfirmasi.',
-          'success'
-        );
       } catch (error) {
         console.error('Error confirming DP:', error);
         Swal.fire(
@@ -114,11 +153,6 @@ export default function OrderSummary({ order, onStatusChange }) {
     if (result.isConfirmed) {
       try {
         await onStatusChange(order.id, 'delivery');
-        Swal.fire(
-          'Berhasil!',
-          'Status pesanan telah diubah menjadi "Dalam Pengiriman".',
-          'success'
-        );
       } catch (error) {
         console.error('Error confirming delivery:', error);
         Swal.fire(
@@ -146,11 +180,6 @@ export default function OrderSummary({ order, onStatusChange }) {
     if (result.isConfirmed) {
       try {
         await onStatusChange(order.id, 'arrived');
-        Swal.fire(
-          'Berhasil!',
-          'Status pesanan telah diubah menjadi "Sudah Sampai".',
-          'success'
-        );
       } catch (error) {
         console.error('Error confirming arrival:', error);
         Swal.fire(
@@ -180,11 +209,6 @@ export default function OrderSummary({ order, onStatusChange }) {
         await onStatusChange(order.id, 'paid', {
           statusRemainingPayment: 'verified'
         });
-        Swal.fire(
-          'Berhasil!',
-          'Pelunasan telah dikonfirmasi dan status pesanan diubah menjadi "Lunas".',
-          'success'
-        );
       } catch (error) {
         console.error('Error confirming full payment:', error);
         Swal.fire(
@@ -198,6 +222,17 @@ export default function OrderSummary({ order, onStatusChange }) {
 
   // Function to confirm order completed
   const confirmCompletion = async () => {
+    // Cek apakah status pernah mencapai 'paid'
+    if (!hasBeenPaid()) {
+      await Swal.fire({
+        title: 'Tidak Dapat Menyelesaikan',
+        text: 'Pesanan belum lunas. Harap konfirmasi pembayaran terlebih dahulu sebelum menyelesaikan pesanan.',
+        icon: 'error',
+        confirmButtonText: 'Mengerti'
+      });
+      return;
+    }
+
     const result = await Swal.fire({
       title: 'Konfirmasi Penyelesaian Pesanan',
       text: 'Apakah Anda yakin ingin menyelesaikan pesanan ini?',
@@ -212,11 +247,6 @@ export default function OrderSummary({ order, onStatusChange }) {
     if (result.isConfirmed) {
       try {
         await onStatusChange(order.id, 'completed');
-        Swal.fire(
-          'Berhasil!',
-          'Pesanan telah diselesaikan.',
-          'success'
-        );
       } catch (error) {
         console.error('Error completing order:', error);
         Swal.fire(
@@ -228,55 +258,76 @@ export default function OrderSummary({ order, onStatusChange }) {
     }
   };
 
+  // Function to cancel order
+  const cancelOrder = async () => {
+    const result = await Swal.fire({
+      title: 'Batalkan Pesanan?',
+      text: 'Apakah Anda yakin ingin membatalkan pesanan ini?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Ya, Batalkan',
+      cancelButtonText: 'Tidak'
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await onStatusChange(order.id, 'cancelled');
+        // Notifikasi sukses sudah ditangani di handleStatusChange
+      } catch (error) {
+        console.error('Error cancelling order:', error);
+        Swal.fire(
+          'Gagal!',
+          `Terjadi kesalahan: ${error.message}`,
+          'error'
+        );
+      }
+    }
+  };
+
   return (
-    <div className="w-96 bg-white rounded-xl border border-gray-200 shadow-md h-fit">
+    <div className="w-96 bg-white rounded-3xl border border-gray-200 shadow-md h-fit">
       {/* Customer Header */}
-      <div className="bg-green-600 text-white p-4 rounded-t-xl">
+      <div className="bg-green-600 text-white py-4 px-6 rounded-t-3xl relative">
         <div className="flex items-center">
-          <svg className="h-6 w-6 mr-2" fill="currentColor" viewBox="0 0 24 24">
+          <svg className="h-8 w-8 mr-4 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
           </svg>
-          <h3 className="font-bold text-xl">{order.customer}</h3>
+          <h3 className="font-semibold text-xl">{order.customer}</h3>
         </div>
+        <button 
+          onClick={toggleNoteModal}
+          className="absolute top-3 right-4 p-1 mt-1.5 hover:text-gray-200 transition-all duration-200 ease-in"
+          title="Lihat Catatan Pesanan"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <path fill="currentColor" fill-rule="evenodd" d="M5 2a3 3 0 0 0-3 3v14a3 3 0 0 0 3 3h9v-5a3 3 0 0 1 3-3h5V5a3 3 0 0 0-3-3zm12.293 19.121a3 3 0 0 1-1.293.762V17a1 1 0 0 1 1-1h4.883a3 3 0 0 1-.762 1.293zM7 6a1 1 0 0 0 0 2h10a1 1 0 1 0 0-2zm0 4a1 1 0 1 0 0 2h10a1 1 0 1 0 0-2zm0 4a1 1 0 1 0 0 2h4a1 1 0 1 0 0-2z" clip-rule="evenodd" />
+          </svg>
+        </button>
       </div>
 
       {/* Order Items List */}
-      <div className="divide-y divide-gray-200">
+      <div className="divide-y divide-gray-200" style={{ maxHeight: '166px', overflowY: 'auto' }}>
         {order.items.map((item, index) => (
-          <div key={index} className="p-4">
+          <div key={index} className="px-6 py-2">
             <div className="flex justify-between items-center">
               <div className="flex items-center">
-                <span className="bg-orange-500 text-white rounded-full w-7 h-7 flex items-center justify-center mr-2">
+                <span className="bg-orange-500 text-white text-sm font-bold rounded-full w-8 h-8 flex items-center justify-center mr-4">
                   {item.quantity}x
                 </span>
                 <div>
-                  <p className="font-medium text-green-700">{`Rp. ${item.price.toLocaleString()}`}</p>
-                  <p>{item.name}</p>
-                  {item.note && (
-                    <p className="text-gray-500 text-sm">{item.note}</p>
-                  )}
+                  <p className="font-semibold text-lg">{item.name}</p>
+                  <p className="font-medium text-green-700 whitespace-nowrap">{`Rp. ${item.price.toLocaleString()}`}</p>
                 </div>
               </div>
-              <button className="text-gray-500 hover:text-gray-700">
-                <svg
-                  className="h-5 w-5"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </button>
             </div>
           </div>
         ))}
       </div>
 
       {/* Order Summary */}
-      <div className="p-4 bg-gray-50">
+      <div className="py-3 px-6 border-t border-gray-200 bg-gray-50">
         <div className="flex justify-between mb-2">
           <p className="font-medium">Sub Total:</p>
           <p className="font-bold">{`Rp. ${calculateTotal().toLocaleString()}`}</p>
@@ -292,38 +343,23 @@ export default function OrderSummary({ order, onStatusChange }) {
       </div>
 
       {/* Shipping Cost Input */}
-      <div className="p-4 bg-gray-100 border-t border-gray-200">
-        <div className="flex items-center bg-white rounded-md border border-gray-300 px-3 py-2">
-          <svg
-            className="h-5 w-5 text-gray-400 mr-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-            />
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-            />
-          </svg>
+      <div className="p-4 bg-gray-100 border-t border-b border-gray-200">
+        <div className="flex items-center bg-white rounded-xl border border-gray-300 pr-2 pl-3 py-2">
+          <img src="https://gevannoyoh.com/thumb-malika/delivery.webp" alt="delivery" className="h-5 w-5 mr-2 drop-shadow" />
           <input
-            type="number"
-            value={tempShippingCost}
-            onChange={(e) => setTempShippingCost(e.target.value)}
+            type="text"
+            value={formatCurrency(tempShippingCost)}
+            onChange={(e) => {
+              const rawValue = parseCurrency(e.target.value);
+              setTempShippingCost(rawValue);
+            }}
             placeholder="Masukkan Nominal Ongkir..."
             className="w-full outline-none text-sm"
           />
           <button
             onClick={saveShippingCost}
             disabled={isUpdatingShipping || !tempShippingCost}
-            className="ml-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm disabled:bg-gray-300 disabled:cursor-not-allowed"
+            className="ml-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
             {isUpdatingShipping ? 'Menyimpan...' : 'Simpan'}
           </button>
@@ -336,22 +372,32 @@ export default function OrderSummary({ order, onStatusChange }) {
           <div>
             <button
               onClick={confirmDownPayment}
-              disabled={order.status !== 'pending'} // Hanya aktif jika status pending
+              disabled={order.status !== 'pending'}
               className={`w-full ${
                 order.status === 'pending' 
                   ? 'bg-orange-400 hover:bg-orange-500' 
                   : 'bg-gray-300 cursor-not-allowed'
-              } text-white py-3 px-4 rounded-md transition duration-200`}
+              } text-white py-3 px-4 rounded-xl transition duration-200`}
             >
               <div className="text-center">
                 <div className="font-bold">Sudah DP</div>
-                <div className="text-sm">50%</div>
-                <div className="text-sm">{`Rp. ${Math.floor(calculateTotal() * 0.5).toLocaleString()}`}</div>
+                <div className="text-sm">
+                  {order.paymentInfo?.downPaymentAmount 
+                    ? `Rp. ${order.paymentInfo.downPaymentAmount.toLocaleString()}` 
+                    : order.paymentInfo?.downPaymentPercent 
+                      ? `Rp. ${Math.floor((order.paymentInfo.subtotal || 0) * (order.paymentInfo.downPaymentPercent / 100)).toLocaleString()}` 
+                      : 'Belum diatur'}
+                </div>
+                <div className="text-sm">
+                  {order.paymentInfo?.statusDownPayment === 'verified' 
+                  ? '(Terverifikasi)' 
+                  : '(Butuh Konfirmasi)'}
+                </div>
               </div>
             </button>
             <button
               onClick={openDPProof}
-              className="w-full bg-orange-100 hover:bg-orange-200 text-orange-600 py-2 px-4 rounded-md transition duration-200 text-sm mt-1"
+              className="w-full bg-orange-100 hover:bg-orange-200 text-orange-600 py-2 px-4 rounded-lg transition duration-200 text-sm mt-1"
             >
               Lihat Bukti DP
             </button>
@@ -359,20 +405,22 @@ export default function OrderSummary({ order, onStatusChange }) {
           <div>
             <button
               onClick={confirmFullPayment}
-              disabled={order.status === 'pending' || order.status === 'completed'}
+              disabled={order.status === 'pending' || order.status === 'completed' || order.status === 'paid' || hasBeenPaid()}
               className={`w-full ${
-                (order.status !== 'pending' && order.status !== 'completed')
+                (order.status !== 'pending' && order.status !== 'completed' && order.status !== 'paid' && !hasBeenPaid())
                   ? 'bg-green-500 hover:bg-green-600'
                   : 'bg-gray-300 cursor-not-allowed'
-              } text-white py-3 px-4 rounded-md transition duration-200`}
+              } text-white py-3 px-4 rounded-xl transition duration-200`}
             >
               <div className="text-center">
                 <div className="font-bold">Lunas</div>
-                <div className="text-sm">50%+Ongkir</div>
                 <div className="text-sm">
-                  {order.paymentInfo?.statusRemainingPayment === 'verified' 
-                    ? 'Terverifikasi' 
-                    : 'Konfirmasi Pelunasan'}
+                  {`Rp. ${calculateRemainingPayment().toLocaleString()}`}
+                </div>
+                <div className="text-sm">
+                  {order.paymentInfo?.statusRemainingPayment === 'verified' || hasBeenPaid()
+                    ? ' (Terverifikasi)' 
+                    : ' (Butuh Konfirmasi)'}
                 </div>
               </div>
             </button>
@@ -383,42 +431,49 @@ export default function OrderSummary({ order, onStatusChange }) {
                 order.status !== 'pending'
                   ? 'bg-gray-100 hover:bg-gray-200'
                   : 'bg-gray-300 cursor-not-allowed'
-              } text-gray-600 py-2 px-4 rounded-md transition duration-200 text-sm mt-1`}
+              } text-gray-600 py-2 px-4 rounded-lg transition duration-200 text-sm mt-1`}
             >
               Lihat Bukti Pelunasan
             </button>
           </div>
         </div>
 
-        <button
-          onClick={() => onStatusChange(order.id, "invoice")}
-          disabled={order.status === 'pending'} // Nonaktif jika status pending
-          className={`w-full ${
-            order.status !== 'pending'
-              ? 'bg-orange-400 hover:bg-orange-500'
-              : 'bg-gray-300 cursor-not-allowed'
-          } text-white py-3 px-4 rounded-md transition duration-200 font-bold`}
-        >
-          Kirim Invoice
-        </button>
-
         {order.status === 'completed' ? (
           <div className="w-full bg-green-400 text-white py-3 px-4 rounded-md text-center cursor-not-allowed">
             Pesanan Selesai
           </div>
-        ) : order.status === 'arrived' || order.status === 'paid' ? (
+        ) : order.status === 'arrived' && hasBeenPaid() ? (
           <button
             onClick={confirmCompletion}
-            className="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-4 rounded-md transition duration-200"
+            className="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-4 rounded-xl transition duration-200"
           >
             Konfirmasi Pesanan Selesai
           </button>
         ) : order.status === 'delivery' ? (
           <button
             onClick={confirmArrival}
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-md transition duration-200"
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-xl transition duration-200"
           >
             Konfirmasi Pesanan Sampai
+          </button>
+        ) : hasBeenPaid() && !hasBeenDelivered() ? (
+          <button
+            onClick={confirmDelivery}
+            disabled={order.status !== 'processed' && order.status !== 'paid'}
+            className={`w-full ${
+              (order.status === 'processed' || order.status === 'paid')
+                ? 'bg-gray-200 hover:bg-gray-300' 
+                : 'bg-gray-100 cursor-not-allowed'
+            } text-gray-800 py-3 px-4 rounded-xl transition duration-200`}
+          >
+            Konfirmasi Pesanan Dikirim
+          </button>
+        ) : hasBeenPaid() && hasBeenDelivered() ? (
+          <button
+            onClick={confirmCompletion}
+            className="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-4 rounded-xl transition duration-200"
+          >
+            Konfirmasi Pesanan Selesai
           </button>
         ) : (
           <button
@@ -428,12 +483,62 @@ export default function OrderSummary({ order, onStatusChange }) {
               order.status === 'processed' 
                 ? 'bg-gray-200 hover:bg-gray-300' 
                 : 'bg-gray-100 cursor-not-allowed'
-            } text-gray-800 py-3 px-4 rounded-md transition duration-200`}
+            } text-gray-800 py-3 px-4 rounded-xl transition duration-200`}
           >
             Konfirmasi Pesanan Dikirim
           </button>
         )}
+
+        <button
+          onClick={cancelOrder}
+          disabled={order.status !== 'pending'}
+          className={`w-full ${
+            order.status === 'pending'
+              ? 'bg-red-500 hover:bg-red-600'
+              : 'bg-gray-300 cursor-not-allowed'
+          } text-white py-3 px-4 rounded-xl transition duration-200 font-bold`}
+        >
+          Batalkan Pesanan
+        </button>
       </div>
+
+      {/* Modal Catatan Pesanan */}
+      {isNoteModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-3xl p-6 w-full max-w-md">
+            <div className="flex justify-center items-center mb-4">
+              <h3 className="text-xl font-semibold">Catatan Pesanan</h3>
+              {/* <button 
+                onClick={toggleNoteModal}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button> */}
+            </div>
+            
+            {order.deliveryInfo?.notes ? (
+              <div className="border border-gray-300 p-4 rounded-xl">
+                <p className="whitespace-pre-wrap cursor-default">{order.deliveryInfo.notes}</p>
+              </div>
+            ) : (
+              <div className="border border-gray-300 p-4 rounded-xl">
+                <p className="text-gray-600 text-center cursor-default">Tidak ada catatan untuk pesanan ini.</p>
+              </div>
+            )}
+            
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={toggleNoteModal}
+                className="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-xl transition-all duration-200 ease-in"
+              >
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -148,22 +148,34 @@ export default async function handler(req, res) {
         
         // Handle status update
         if (rest.status && rest.status !== orderData.status) {
+          // Validasi transisi status
+          const validTransitions = {
+            pending: ['processed', 'cancelled'],
+            processed: ['delivery', 'paid', 'cancelled'],
+            delivery: ['arrived', 'cancelled'],
+            arrived: ['paid', 'completed'],
+            paid: ['completed', 'delivery', 'arrived'],
+            completed: [],
+            cancelled: []
+          };
+
+          if (!validTransitions[orderData.status]?.includes(rest.status)) {
+            return res.status(400).json({
+              error: `Transisi status tidak valid: dari ${orderData.status} ke ${rest.status}`
+            });
+          }
+
           allowedUpdates.status = rest.status;
           
-          // Create a new status history entry with the timestamp
+          // Create a new status history entry
           const newStatusEntry = {
             from: orderData.status,
             to: rest.status,
             timestamp: admin.firestore.Timestamp.now(),
-            updatedBy: userId // Menggunakan userId dari decoded token, bukan dari body
+            updatedBy: userId
           };
           
-          console.log("Creating status history entry:", newStatusEntry);
-          
-          // Get existing status history or create new array
           const currentStatusHistory = orderData.statusHistory || [];
-          
-          // Update the allowedUpdates object
           allowedUpdates.statusHistory = [...currentStatusHistory, newStatusEntry];
         }
       }

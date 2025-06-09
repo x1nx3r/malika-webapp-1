@@ -139,14 +139,59 @@ export default function PaymentRedirect() {
     }
   };
 
+  const formatCurrency = (value) => {
+    if (!value) return '';
+    return `Rp ${Number(value).toLocaleString('id-ID')}`;
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("id-ID", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
   // Tampilkan loading
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
+        {/* Header */}
+        <div className="px-30 fixed top-0 left-0 right-0">
+          <div className="w-full h-16 bg-green-700 rounded-bl-2xl rounded-br-2xl mb-6">
+            <div className="absolute right-34 top-3">
+              <button
+              onClick={() => navigate("/")}
+              className="w-[130px] h-10 bg-white rounded-lg overflow-hidden flex justify-center items-center hover:bg-gray-100 transition-all duration-200 ease-in"
+              >
+                <div className="mr-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24">
+                    <g fill="none">
+                      <path d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.019-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z" />
+                      <path fill="currentColor" d="M3.283 10.94a1.5 1.5 0 0 0 0 2.12l5.656 5.658a1.5 1.5 0 1 0 2.122-2.122L7.965 13.5H19.5a1.5 1.5 0 0 0 0-3H7.965l3.096-3.096a1.5 1.5 0 1 0-2.122-2.121z" />
+                    </g>
+                  </svg>
+                </div>
+                <span className="ml-2 mr-1 text-stone-950 text-sm font-semibold font-poppins cursor-pointer">
+                  Kembali
+                </span>
+              </button>
+            </div>
+            <div className="absolute left-1/2 top-4.5 transform -translate-x-1/2">
+              <h1 className="text-white text-2xl font-semibold font-poppins">
+                Pembayaran
+              </h1>
+            </div>
+          </div>
+        </div>
+
         <div className="flex flex-col items-center gap-3">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500"></div>
           <div className="text-base font-medium text-gray-700">
-            Memeriksa order aktif Anda...
+            Sedang memuat...
           </div>
         </div>
       </div>
@@ -178,67 +223,186 @@ export default function PaymentRedirect() {
 
   // Tampilkan daftar order jika ada lebih dari 1
   if (activeOrders.length > 1) {
+    // Filter order untuk pembayaran DP
+    const dpOrders = activeOrders.filter(order => 
+      order.paymentInfo?.statusDownPayment === 'pending' || 
+      order.paymentInfo?.statusDownPayment === 'pending_verification'
+    );
+
+    // Filter order untuk pelunasan
+    const fullPaymentOrders = activeOrders.filter(order => 
+      order.paymentInfo?.statusDownPayment === 'verified' && 
+      (order.paymentInfo?.statusRemainingPayment === 'pending' || 
+      order.paymentInfo?.statusRemainingPayment === 'pending_verification')
+    );
+
     return (
-      <div className="container mx-auto max-w-4xl py-8 px-4">
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">Order Aktif Anda</h1>
-          <p className="text-gray-600">Pilih order yang ingin Anda lihat atau lanjutkan</p>
-        </div>
-        
-        <div className="grid gap-4">
-          {activeOrders.map((order) => (
-            <div
-              key={order.id}
-              onClick={() => navigate(`/payment/${order.id}`)}
-              className="p-6 border rounded-xl shadow-sm hover:shadow-md hover:bg-gray-50 cursor-pointer transition-all duration-200 bg-white"
-            >
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h3 className="font-semibold text-lg text-gray-800">
-                    Order #{order.id}
-                  </h3>
-                  <p className="text-sm text-gray-500">
-                    {new Date(order.createdAt).toLocaleDateString("id-ID", {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
-                  </p>
+      <div className=" py-8">
+        {/* Header */}
+        <div className="px-30 fixed top-0 left-0 right-0">
+          <div className="w-full h-16 bg-green-700 rounded-bl-2xl rounded-br-2xl mb-6">
+            <div className="absolute right-34 top-3">
+              <button
+              onClick={() => navigate("/")}
+              className="w-[130px] h-10 bg-white rounded-lg overflow-hidden flex justify-center items-center hover:bg-gray-100 transition-all duration-200 ease-in"
+              >
+                <div className="mr-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24">
+                    <g fill="none">
+                      <path d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.019-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z" />
+                      <path fill="currentColor" d="M3.283 10.94a1.5 1.5 0 0 0 0 2.12l5.656 5.658a1.5 1.5 0 1 0 2.122-2.122L7.965 13.5H19.5a1.5 1.5 0 0 0 0-3H7.965l3.096-3.096a1.5 1.5 0 1 0-2.122-2.121z" />
+                    </g>
+                  </svg>
                 </div>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(order.status)}`}>
-                  {getStatusLabel(order.status)}
+                <span className="ml-2 mr-1 text-stone-950 text-sm font-semibold font-poppins cursor-pointer">
+                  Kembali
                 </span>
-              </div>
-              
-              <div className="flex justify-between items-center">
-                <div className="text-sm text-gray-600">
-                  {order.status.toLowerCase() === 'pending' && (
-                    <span>Menunggu pembayaran uang muka</span>
-                  )}
-                  {order.status.toLowerCase() === 'processed' && (
-                    <span>Order sedang diproses</span>
-                  )}
-                  {order.status.toLowerCase() === 'delivery' && (
-                    <span>Order sedang dalam pengiriman</span>
-                  )}
-                </div>
-                <div className="text-right">
-                  <div className="text-sm text-gray-500">Uang Muka</div>
-                  <div className="text-lg font-bold text-amber-600">
-                    Rp {order.paymentInfo?.downPaymentAmount?.toLocaleString("id-ID") || "0"}
+              </button>
+            </div>
+            <div className="absolute left-1/2 top-4.5 transform -translate-x-1/2">
+              <h1 className="text-white text-2xl font-semibold font-poppins">
+                Pembayaran
+              </h1>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="pt-16 pb-8 flex justify-center items-center px-44">
+          <div className="w-[1400px]">
+            {/* Two Column Layout */}
+            <div className="grid grid-cols-2 gap-10">
+              {/* Left Column - Pembayaran DP */}
+              <div className="space-y-4">
+                <h2 className="text-2xl font-semibold font-poppins text-gray-800 text-center mb-4">
+                  Pembayaran DP
+                </h2>
+                
+                {dpOrders.length > 0 ? (
+                  dpOrders.map((order) => (
+                    <div
+                      key={`dp-${order.id}`}
+                      className="bg-white rounded-xl border border-gray-300 px-6 py-4"
+                    >
+                      {/* Card DP */}
+                      <div className="mb-2">
+                        <h3 className="text-xl font-semibold font-poppins text-gray-800 mb-2">
+                          Order Id: {order.id}
+                        </h3>
+                        <p className="text-xs text-gray-800 font-poppins">
+                          {formatDate(order.createdAt)}
+                        </p>
+                      </div>
+                      
+                      <div className="flex justify-between items-start">
+                        <div className="mb-2">
+                          <ul className="text-sm text-gray-800 font-poppins">
+                            {order.items?.map((item, index) => (
+                              <li key={index}>
+                                • {item.name} ({item.quantity}x)
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div className="flex flex-col justify-between items-end mb-6">
+                          <span className="text-xs text-gray-800 font-poppins">Uang Muka</span>
+                          <span className="text-lg font-bold text-orange-500">
+                            {formatCurrency(order.paymentInfo?.downPaymentAmount)}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="border-t border-gray-300 pt-3 flex justify-between items-center">
+                        <p className="text-xs text-gray-800 italic font-poppins">
+                          Tekan "BUKA" bila ingin melakukan pembayaran
+                        </p>
+                        <button 
+                          className="w-20 h-8 bg-orange-500 hover:bg-orange-600 text-white py-2 px-4 flex justify-center items-center rounded-lg transition-all duration-200 ease-in cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/payment/${order.id}?type=dp`);
+                          }}
+                        >
+                          <span className="font-poppins text-sm mt-0.5">
+                            Buka
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="bg-white rounded-xl border border-gray-300 p-6 text-center">
+                    <p className="text-gray-500">Tidak ada pesanan yang memerlukan pembayaran DP</p>
                   </div>
-                </div>
+                )}
               </div>
-              
-              <div className="mt-4 pt-4 border-t border-gray-100">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-500">Klik untuk melihat detail</span>
-                  <span className="text-amber-600 font-medium">→</span>
-                </div>
+
+              {/* Right Column - Pelunasan */}
+              <div className="space-y-4">
+                <h2 className="text-2xl font-semibold font-poppins text-gray-800 text-center mb-4">
+                  Pelunasan
+                </h2>
+                
+                {fullPaymentOrders.length > 0 ? (
+                  fullPaymentOrders.map((order) => (
+                    <div
+                      key={`full-${order.id}`}
+                      className="bg-white rounded-xl border border-gray-300 px-6 py-4"
+                    >
+                      {/* Card Pelunasan */}
+                      <div className="mb-2">
+                        <h3 className="text-xl font-semibold font-poppins text-gray-800 mb-2">
+                          Order Id: {order.id}
+                        </h3>
+                        <p className="text-xs text-gray-800 font-poppins">
+                          {formatDate(order.createdAt)}
+                        </p>
+                      </div>
+                      
+                      <div className="flex justify-between items-start">
+                        <div className="mb-2">
+                          <ul className="text-sm text-gray-800 font-poppins">
+                            {order.items?.map((item, index) => (
+                              <li key={index}>
+                                • {item.name} ({item.quantity}x)
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div className="flex flex-col justify-between items-end mb-6">
+                          <span className="text-xs text-gray-800 font-poppins">Uang Lunas</span>
+                          <span className="text-lg font-bold text-orange-500">
+                            Rp{((order?.paymentInfo?.remainingPayment || 0) + (order?.paymentInfo?.shipingCost || 0)).toLocaleString("id-ID")}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="border-t border-gray-300 pt-3 flex justify-between items-center">
+                        <p className="text-xs text-gray-800 italic font-poppins">
+                          Tekan "BUKA" bila ingin melakukan pembayaran
+                        </p>
+                        <button 
+                          className="w-20 h-8 bg-orange-500 hover:bg-orange-600 text-white py-2 px-4 flex justify-center items-center rounded-lg transition-all duration-200 ease-in"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/payment/${order.id}?type=full`);
+                          }}
+                        >
+                          <span className="font-poppins text-sm mt-0.5">
+                            Buka
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="bg-white rounded-xl border border-gray-300 p-6 text-center">
+                    <p className="text-gray-500">Tidak ada pesanan yang memerlukan pelunasan</p>
+                  </div>
+                )}
               </div>
             </div>
-          ))}
+          </div>
         </div>
       </div>
     );

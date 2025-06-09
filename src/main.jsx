@@ -1,19 +1,22 @@
-import ReactDOM from 'react-dom/client';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useEffect, useState, useRef } from 'react';
-import { auth } from './firebase';
-import Index from './pages/index/index';
-import AuthIndex from './pages/auth/auth';
-import TestPage from './pages/testpage/index';
-import AboutMe from './pages/aboutme/aboutme';
-import AdminPenjualan from './pages/adminPenjualan/adminPenjualan';
-import AdminKeuangan from './pages/adminKeuangan/adminKeuangan';
-import AdminKelolaMenu from './pages/adminKelolaMenu/adminKelolaMenu';
-import './index.css';
-import ShoppingCart from './pages/shoppingCart/shoppingCart';
-import Checkout from './pages/checkOut/checkOut';
-import PaymentRedirect from './pages/payment/components/paymentRedirect';
-import PaymentPage from './pages/payment/paymentPage';
+import ReactDOM from "react-dom/client";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useEffect, useState, useRef } from "react";
+import { auth } from "./firebase";
+import Index from "./pages/index/index";
+import AuthIndex from "./pages/auth/auth";
+import TestPage from "./pages/testpage/index";
+import AboutMe from "./pages/aboutme/aboutme";
+import AdminPenjualan from "./pages/adminPenjualan/adminPenjualan";
+import AdminKeuangan from "./pages/adminKeuangan/adminKeuangan";
+import AdminKelolaMenu from "./pages/adminKelolaMenu/adminKelolaMenu";
+import "./index.css";
+import ShoppingCart from "./pages/shoppingCart/shoppingCart";
+import Checkout from "./pages/checkOut/checkOut";
+import PaymentRedirect from "./pages/payment/components/paymentRedirect";
+import PaymentPage from "./pages/payment/paymentPage";
+import ProfilePage from "./pages/profile/profilePage";
+import HistoryPage from "./pages/history/historyPage";
+import HistoryDetailPage from "./pages/history/historyDetailPage";
 
 const AppWrapper = () => {
   const [user, setUser] = useState(null);
@@ -98,7 +101,7 @@ const AppWrapper = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        Loading...
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
       </div>
     );
   }
@@ -124,6 +127,9 @@ const AppWrapper = () => {
         <Route path="/payment" element={<PaymentRedirect />} />
         <Route path="/payment/:orderId" element={<PaymentPage />} />
         <Route path="/aboutme" element={<AboutMe />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/history" element={<HistoryPage />} />
+        <Route path="/history/:orderId" element={<HistoryDetailPage />} />   
       </Routes>
     </BrowserRouter>
   );
