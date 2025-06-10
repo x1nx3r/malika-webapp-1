@@ -8,9 +8,37 @@ import AddressList from "./components/AddressList";
 import Swal from "sweetalert2";
 
 function ProfilePage() {
+  const [userData, setUserData] = useState(null);
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      if (auth.currentUser) {
+        try {
+          const userRef = doc(db, "users", auth.currentUser.uid);
+          const docSnap = await getDoc(userRef);
+          
+          if (docSnap.exists()) {
+            setAddresses(docSnap.data().address || []);
+            // Ambil data user dan simpan ke state
+            setUserData({
+              name: auth.currentUser.displayName || "",
+              email: auth.currentUser.email || "",
+              phone: docSnap.data().phone || "",
+            });
+          }
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchData();
+  }, []);
+  
   useEffect(() => {
     const fetchAddresses = async () => {
       if (auth.currentUser) {
@@ -99,14 +127,24 @@ function ProfilePage() {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <ProfileHeader />
+        <div className="flex flex-col items-center gap-3">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500"></div>
+          <div className="text-base font-medium text-gray-700">
+            Sedang memuat...
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="min-h-screen pb-20">
       <ProfileHeader />
       <div className="max-w-3xl mx-auto pt-20 pb-4 py-6">
-        <UserIdentity />
+        <UserIdentity userData={userData} />
         <AddAddress onAddAddress={handleAddAddress} />
         <AddressList 
           addresses={addresses} 
