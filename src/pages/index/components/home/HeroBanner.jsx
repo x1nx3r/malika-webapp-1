@@ -1,6 +1,6 @@
 function HeroBanner() {
   return (
-    <section className="w-full px-4 py-6">
+    <section className="w-full">
       <div className="relative rounded-lg overflow-hidden shadow-md">
         {/* Background Image with Overlay */}
         <div className="relative">

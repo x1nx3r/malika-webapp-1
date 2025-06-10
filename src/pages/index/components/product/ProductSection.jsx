@@ -12,9 +12,9 @@ function ProductSection({
   if (products.length === 0 && showEmptyMessage) {
     return (
       <section className="py-8">
-        <div className="text-center py-12 bg-gray-50 rounded-lg">
-          <h2 className="text-2xl font-semibold text-gray-700 mb-2">{title}</h2>
-          <p className="text-gray-500">No products found in this category</p>
+        <div className="text-center font-poppins py-46 flex flex-col items-center gap-4">
+          <h2 className="text-2xl font-medium text-gray-700 mb-2">{title}</h2>
+          <p className="text-gray-600">No products found matching</p>
         </div>
       </section>
     );

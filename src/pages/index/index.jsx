@@ -24,6 +24,7 @@ function Index() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [searchTimeout, setSearchTimeout] = useState(null);
 
   // Category mapping for smooth scrolling
   const categoryScrollMap = {
@@ -90,21 +91,25 @@ function Index() {
 
   // Search functionality
   const handleSearch = (query) => {
-    setSearchQuery(query);
+    if (searchTimeout) clearTimeout(searchTimeout);
 
-    if (!query.trim()) {
-      clearSearch();
-      return;
-    }
+    setSearchTimeout(setTimeout(() => {
+      setSearchQuery(query);
 
-    setIsSearching(true);
-    const results = allProducts.filter(
-      (product) =>
-        product.name.toLowerCase().includes(query.toLowerCase()) ||
-        (product.description &&
-          product.description.toLowerCase().includes(query.toLowerCase())),
-    );
-    setSearchResults(results);
+      if (!query.trim()) {
+        clearSearch();
+        return;
+      }
+
+      setIsSearching(true);
+      const results = allProducts.filter(
+        (product) =>
+          product.name.toLowerCase().includes(query.toLowerCase()) ||
+          (product.description &&
+            product.description.toLowerCase().includes(query.toLowerCase()))
+      );
+      setSearchResults(results);
+    }, 500));
   };
 
   // Clear search state
@@ -162,6 +167,12 @@ function Index() {
     ];
   };
 
+  useEffect(() => {
+    if (searchQuery.trim() === "") {
+      clearSearch();
+    }
+  }, [searchQuery]);
+
   // Fetch menu data on component mount
   useEffect(() => {
     const fetchMenuData = async () => {
@@ -209,71 +220,57 @@ function Index() {
   const productsToShow = getProductsToShow();
 
   return (
-    <div className="min-h-screen flex justify-center bg-gray-100">
-      {/* Main container with constrained width */}
-      <div className="relative w-full bg-white shadow-md">
-        {/* Sticky header wrapper */}
-        <div className="sticky top-0 z-50 bg-white shadow-md">
-          <Navbar onSearch={handleSearch} />
-          <CategoryNav
-            onCategoryClick={handleCategoryClick}
-            activeCategory={activeCategory}
-          />
-        </div>
-
-        {/* Main content */}
-        <div className="w-full">
-          {/* Hero Banner - only show when not searching */}
-          {!isSearching && <HeroBanner />}
-
-          {/* Product Sections */}
-          <div className="w-full px-4 py-4">
-            {productsToShow.map((section, index) => (
-              <div
-                key={section.id || index}
-                id={section.id}
-                className="scroll-mt-36" // Adjusted for sticky header
-              >
-                <ProductSection
-                  title={section.title}
-                  products={section.products}
-                  onAddToCart={handleAddToCart}
-                  addingItems={addingItems}
-                  showEmptyMessage={isSearching && searchResults.length === 0}
-                />
-              </div>
-            ))}
+    <div>
+        <div className="min-h-screen flex justify-center px-30">
+        {/* Main container with constrained width */}
+        <div className="relative w-full">
+          {/* Sticky header wrapper */}
+          <div className="sticky top-0 z-50">
+            <Navbar onSearch={handleSearch} />
+            <CategoryNav
+              onCategoryClick={handleCategoryClick}
+              activeCategory={activeCategory}
+            />
           </div>
 
-          {/* No search results message */}
-          {isSearching && searchResults.length === 0 && (
-            <div className="text-center py-10">
-              <p className="text-xl text-gray-600">
-                No products found matching "{searchQuery}"
-              </p>
-              <button
-                onClick={clearSearch}
-                className="mt-4 px-6 py-2 bg-orange-500 text-white rounded-full hover:bg-orange-600 transition-colors"
-              >
-                Clear Search
-              </button>
+          {/* Main content */}
+          <div className="w-full">
+            {/* Hero Banner - only show when not searching */}
+            {!isSearching && <HeroBanner />}
+
+            {/* Product Sections */}
+            <div className="w-full py-0">
+              {productsToShow.map((section, index) => (
+                <div
+                  key={section.id || index}
+                  id={section.id}
+                  className="scroll-mt-36" // Adjusted for sticky header
+                >
+                  <ProductSection
+                    title={section.title}
+                    products={section.products}
+                    onAddToCart={handleAddToCart}
+                    addingItems={addingItems}
+                    showEmptyMessage={isSearching && searchResults.length === 0}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Notification Toast */}
+          {notification && (
+            <div
+              className={`fixed bottom-4 right-4 py-2 rounded-lg shadow-lg z-50 ${
+                notification.type === "success" ? "bg-green-500" : "bg-red-500"
+              } text-white`}
+            >
+              {notification.message}
             </div>
           )}
-
-          <Footer />
         </div>
-
-        {/* Notification Toast */}
-        {notification && (
-          <div
-            className={`fixed bottom-4 right-4 px-4 py-2 rounded-lg shadow-lg z-50 ${
-              notification.type === "success" ? "bg-green-500" : "bg-red-500"
-            } text-white`}
-          >
-            {notification.message}
-          </div>
-        )}
       </div>
+      <Footer />
     </div>
   );
 }
