@@ -1,38 +1,30 @@
 import { useState } from "react";
+import Swal from "sweetalert2";
 
 function AddAddress({ onAddAddress }) {
-  // Data dummy untuk form alamat baru
-  const [newAddress, setNewAddress] = useState({
-    label: "",
-    address: ""
-  });
+  const [address, setAddress] = useState("");
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewAddress({
-      ...newAddress,
-      [name]: value
-    });
+    setAddress(e.target.value);
   };
 
-  const handleAddAddress = () => {
-    if (!newAddress.label || !newAddress.address) {
-      alert("Label dan alamat harus diisi!");
+  const handleAddAddress = async () => {
+    if (!address.trim()) {
+      await Swal.fire({
+        title: 'Error!',
+        text: 'Alamat harus diisi!',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
       return;
     }
 
-    // Simulasikan penambahan alamat baru
-    const dummyId = Math.floor(Math.random() * 1000) + 3; // ID acak
-    const addressToAdd = {
-      id: dummyId,
-      label: newAddress.label,
-      address: newAddress.address,
-      isPrimary: false
-    };
-    
-    onAddAddress(addressToAdd);
-    setNewAddress({ label: "", address: "" });
-    alert("Alamat baru berhasil ditambahkan!");
+    try {
+      await onAddAddress(address);
+      setAddress("");
+    } catch (error) {
+      // Error sudah dihandle di parent component
+    }
   };
 
   return (
@@ -46,8 +38,7 @@ function AddAddress({ onAddAddress }) {
 
       <div className="w-2/3 mb-4">
         <textarea
-          name="address"
-          value={newAddress.address}
+          value={address}
           onChange={handleInputChange}
           placeholder="Masukkan alamat lengkap, sertakan Keluarahan, Kecamatan dan Nama Kota"
           className="w-full h-[110px] border border-gray-400 text-gray-800 rounded-xl px-3 py-2 focus:outline-0 focus:border-gray-600 transition-all duration-150 ease-in"
