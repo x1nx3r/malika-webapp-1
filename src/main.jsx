@@ -4,7 +4,6 @@ import { useEffect, useState, useRef } from "react";
 import { auth } from "./firebase";
 import Index from "./pages/index/index";
 import AuthIndex from "./pages/auth/auth";
-import TestPage from "./pages/testpage/index";
 import AboutMe from "./pages/aboutme/aboutme";
 import AdminPenjualan from "./pages/adminPenjualan/adminPenjualan";
 import AdminKeuangan from "./pages/adminKeuangan/adminKeuangan";
@@ -21,7 +20,6 @@ import HistoryDetailPage from "./pages/history/historyDetailPage";
 const AppWrapper = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  // Use a ref for the timer to prevent memory leaks
   const tokenRefreshTimer = useRef(null);
 
   // Function to refresh the token and update cookie
@@ -109,27 +107,45 @@ const AppWrapper = () => {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Halaman yang bisa diakses tanpa login */}
+        <Route path="/" element={<Index />} />
+        <Route path="/aboutme" element={<AboutMe />} />
+        <Route path="/auth" element={user ? <Navigate to="/" replace /> : <AuthIndex />} />
+        
+        {/* Halaman yang memerlukan login */}
         <Route
-          path="/"
-          element={user ? <Index /> : <Navigate to="/auth" replace />}
+          path="/cart"
+          element={user ? <ShoppingCart /> : <Navigate to="/auth" replace />}
         />
         <Route
-          path="/auth"
-          element={user ? <Navigate to="/" replace /> : <AuthIndex />}
+          path="/checkout"
+          element={user ? <Checkout /> : <Navigate to="/auth" replace />}
         />
-        <Route path="/dev" element={<TestPage />} />
-        <Route path="/about" element={<AboutMe />} />
+        <Route
+          path="/payment"
+          element={user ? <PaymentRedirect /> : <Navigate to="/auth" replace />}
+        />
+        <Route
+          path="/payment/:orderId"
+          element={user ? <PaymentPage /> : <Navigate to="/auth" replace />}
+        />
+        <Route
+          path="/profile"
+          element={user ? <ProfilePage /> : <Navigate to="/auth" replace />}
+        />
+        <Route
+          path="/history"
+          element={user ? <HistoryPage /> : <Navigate to="/auth" replace />}
+        />
+        <Route
+          path="/history/:orderId"
+          element={user ? <HistoryDetailPage /> : <Navigate to="/auth" replace />}
+        />
+        
+        {/* Halaman admin tetap sama */}
         <Route path="/admin" element={<AdminPenjualan />} />
         <Route path="/admin/keuangan" element={<AdminKeuangan />} />
         <Route path="/admin/kelolamenu" element={<AdminKelolaMenu />} />
-        <Route path="/cart" element={<ShoppingCart />} />
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="/payment" element={<PaymentRedirect />} />
-        <Route path="/payment/:orderId" element={<PaymentPage />} />
-        <Route path="/aboutme" element={<AboutMe />} />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/history" element={<HistoryPage />} />
-        <Route path="/history/:orderId" element={<HistoryDetailPage />} />   
       </Routes>
     </BrowserRouter>
   );

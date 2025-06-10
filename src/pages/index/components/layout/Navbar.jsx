@@ -1,47 +1,126 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../../../firebase";
+import Swal from 'sweetalert2';
 
 function Navbar({ onSearch }) {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [isMenuDropdownOpen, setIsMenuDropdownOpen] = useState(false);
+  const [user, setUser] = useState(null);
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (onSearch && searchQuery.trim()) {
-      onSearch(searchQuery);
+  // Monitor auth state
+  useState(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setUser(user);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleCartClick = () => {
+    if (!auth.currentUser) {
+      navigate('/auth');
+      return;
     }
+    navigate('/cart');
+  };
+
+  const handlePaymentClick = () => {
+    if (!auth.currentUser) {
+      navigate('/auth');
+      return;
+    }
+    navigate('/payment');
   };
 
   const handleLogout = async () => {
-    try {
-      console.log("Logging out...");
-      setIsMenuDropdownOpen(false);
+    // Tutup dropdown menu terlebih dahulu
+    setIsMenuDropdownOpen(false);
 
-      // First sign out from Firebase Auth
-      await auth.signOut();
-
-      // Then call the server logout endpoint to clear cookies
-      const response = await fetch("/api/auth", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ action: "logout" }),
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        throw new Error("Server logout failed");
+    // Tampilkan popup konfirmasi dengan SweetAlert2
+    const result = await Swal.fire({
+      title: 'Konfirmasi Logout',
+      text: 'Apakah Anda yakin ingin keluar dari akun ini?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Ya, Keluar',
+      cancelButtonText: 'Batal',
+      reverseButtons: true,
+      customClass: {
+        container: 'swal2-container',
+        popup: 'swal2-popup',
+        title: 'swal2-title',
+        content: 'swal2-content',
+        confirmButton: 'swal2-confirm',
+        cancelButton: 'swal2-cancel'
       }
+    });
 
-      // Redirect to login page after successful logout
-      navigate("/");
-    } catch (error) {
-      console.error("Error signing out:", error);
-      // Even if there was an error, try to navigate away
-      navigate("/");
+    // Jika user mengkonfirmasi logout
+    if (result.isConfirmed) {
+      try {
+        console.log("Logging out...");
+
+        // Tampilkan loading saat proses logout
+        Swal.fire({
+          title: 'Sedang Logout...',
+          text: 'Mohon tunggu sebentar',
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          showConfirmButton: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+
+        // First sign out from Firebase Auth
+        await auth.signOut();
+
+        // Then call the server logout endpoint to clear cookies
+        const response = await fetch("/api/auth", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ action: "logout" }),
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw new Error("Server logout failed");
+        }
+
+        // Tutup loading dan tampilkan pesan sukses
+        await Swal.fire({
+          title: 'Logout Berhasil!',
+          text: 'Anda telah berhasil keluar dari akun.',
+          icon: 'success',
+          confirmButtonColor: '#28a745',
+          confirmButtonText: 'OK',
+          timer: 2000,
+          timerProgressBar: true
+        });
+
+        // Redirect to home page after successful logout
+        navigate("/");
+      } catch (error) {
+        console.error("Error signing out:", error);
+        
+        // Tampilkan pesan error jika logout gagal
+        await Swal.fire({
+          title: 'Logout Gagal',
+          text: 'Terjadi kesalahan saat logout. Silakan coba lagi.',
+          icon: 'error',
+          confirmButtonColor: '#dc3545',
+          confirmButtonText: 'OK'
+        });
+
+        // Even if there was an error, try to navigate away
+        navigate("/");
+      }
     }
   };
 
@@ -57,7 +136,11 @@ function Navbar({ onSearch }) {
 
   const handleClearSearch = () => {
     setSearchQuery("");
-    onSearch(""); // Memanggil onSearch dengan string kosong untuk kembali ke menu utama
+    onSearch("");
+  };
+
+  const handleLogin = () => {
+    navigate("/auth");
   };
 
   return (
@@ -173,28 +256,58 @@ function Navbar({ onSearch }) {
                   label="Keranjang"
                   hasBorder
                   left
-                  onClick={() => navigate("/cart")}
+                  onClick={handleCartClick}
                 />
                 <NavItem
                   icon={<PaymentIcon />}
                   label="Pembayaran"
                   hasBorder
                   notification
-                  onClick={() => navigate("/payment")}
+                  onClick={handlePaymentClick}
                 />
-                <MenuNavItem
-                  isDropdownOpen={isMenuDropdownOpen}
-                  setIsDropdownOpen={setIsMenuDropdownOpen}
-                  onProfile={handleProfile}
-                  onHistory={handleHistory}
-                  onLogout={handleLogout}
-                />
+                {user ? (
+                  <MenuNavItem
+                    isDropdownOpen={isMenuDropdownOpen}
+                    setIsDropdownOpen={setIsMenuDropdownOpen}
+                    onProfile={handleProfile}
+                    onHistory={handleHistory}
+                    onLogout={handleLogout}
+                  />
+                ) : (
+                  <LoginNavItem onClick={handleLogin} />
+                )}
               </div>
             </div>
           </div>
         </div>
       </div>
     </header>
+  );
+}
+
+// Komponen LoginNavItem yang baru
+function LoginNavItem({ onClick }) {
+  return (
+    <div
+      onClick={onClick}
+      className="flex-1 md:w-24 py-2 md:h-16 flex items-center justify-center relative cursor-pointer hover:bg-green-800 hover:rounded-br-xl transition-all duration-200 ease-in"
+    >
+      <div className="flex flex-col items-center">
+        <div className="w-7 h-7 relative mb-1">
+          <LoginIcon />
+        </div>
+        <div className="text-center text-white text-xs font-poppins font-medium">Login</div>
+      </div>
+    </div>
+  );
+}
+
+// Komponen LoginIcon yang baru
+function LoginIcon() {
+  return (
+    <svg className="w-full h-full text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2m0 4c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6m0 14c-2.03 0-4.43-.82-6.14-2.88a9.95 9.95 0 0 1 12.28 0C16.43 19.18 14.03 20 12 20" stroke-width="0.5" stroke="currentColor" />
+    </svg>
   );
 }
 
@@ -209,7 +322,7 @@ function NavItem({ icon, label, left, hasBorder, notification, onClick }) {
     >
       <div className="flex flex-col items-center">
         <div className="w-6 h-6 sm:w-7 sm:h-7 relative mb-1">{icon}</div>
-        <div className="text-center text-white text-xs font-medium">
+        <div className="text-center text-white text-xs font-poppins font-medium">
           {label}
         </div>
       </div>
