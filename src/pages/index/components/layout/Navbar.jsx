@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../../../firebase";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
+import malikaLogo from "../../../../assets/malika.svg";
 
 function Navbar({ onSearch }) {
   const navigate = useNavigate();
@@ -20,18 +21,18 @@ function Navbar({ onSearch }) {
 
   const handleCartClick = () => {
     if (!auth.currentUser) {
-      navigate('/auth');
+      navigate("/auth");
       return;
     }
-    navigate('/cart');
+    navigate("/cart");
   };
 
   const handlePaymentClick = () => {
     if (!auth.currentUser) {
-      navigate('/auth');
+      navigate("/auth");
       return;
     }
-    navigate('/payment');
+    navigate("/payment");
   };
 
   const handleLogout = async () => {
@@ -40,23 +41,23 @@ function Navbar({ onSearch }) {
 
     // Tampilkan popup konfirmasi dengan SweetAlert2
     const result = await Swal.fire({
-      title: 'Konfirmasi Logout',
-      text: 'Apakah Anda yakin ingin keluar dari akun ini?',
-      icon: 'question',
+      title: "Konfirmasi Logout",
+      text: "Apakah Anda yakin ingin keluar dari akun ini?",
+      icon: "question",
       showCancelButton: true,
-      confirmButtonColor: '#dc3545',
-      cancelButtonColor: '#6c757d',
-      confirmButtonText: 'Ya, Keluar',
-      cancelButtonText: 'Batal',
+      confirmButtonColor: "#dc3545",
+      cancelButtonColor: "#6c757d",
+      confirmButtonText: "Ya, Keluar",
+      cancelButtonText: "Batal",
       reverseButtons: true,
       customClass: {
-        container: 'swal2-container',
-        popup: 'swal2-popup',
-        title: 'swal2-title',
-        content: 'swal2-content',
-        confirmButton: 'swal2-confirm',
-        cancelButton: 'swal2-cancel'
-      }
+        container: "swal2-container",
+        popup: "swal2-popup",
+        title: "swal2-title",
+        content: "swal2-content",
+        confirmButton: "swal2-confirm",
+        cancelButton: "swal2-cancel",
+      },
     });
 
     // Jika user mengkonfirmasi logout
@@ -66,14 +67,14 @@ function Navbar({ onSearch }) {
 
         // Tampilkan loading saat proses logout
         Swal.fire({
-          title: 'Sedang Logout...',
-          text: 'Mohon tunggu sebentar',
+          title: "Sedang Logout...",
+          text: "Mohon tunggu sebentar",
           allowOutsideClick: false,
           allowEscapeKey: false,
           showConfirmButton: false,
           didOpen: () => {
             Swal.showLoading();
-          }
+          },
         });
 
         // First sign out from Firebase Auth
@@ -95,27 +96,27 @@ function Navbar({ onSearch }) {
 
         // Tutup loading dan tampilkan pesan sukses
         await Swal.fire({
-          title: 'Logout Berhasil!',
-          text: 'Anda telah berhasil keluar dari akun.',
-          icon: 'success',
-          confirmButtonColor: '#28a745',
-          confirmButtonText: 'OK',
+          title: "Logout Berhasil!",
+          text: "Anda telah berhasil keluar dari akun.",
+          icon: "success",
+          confirmButtonColor: "#28a745",
+          confirmButtonText: "OK",
           timer: 2000,
-          timerProgressBar: true
+          timerProgressBar: true,
         });
 
         // Redirect to home page after successful logout
         navigate("/");
       } catch (error) {
         console.error("Error signing out:", error);
-        
+
         // Tampilkan pesan error jika logout gagal
         await Swal.fire({
-          title: 'Logout Gagal',
-          text: 'Terjadi kesalahan saat logout. Silakan coba lagi.',
-          icon: 'error',
-          confirmButtonColor: '#dc3545',
-          confirmButtonText: 'OK'
+          title: "Logout Gagal",
+          text: "Terjadi kesalahan saat logout. Silakan coba lagi.",
+          icon: "error",
+          confirmButtonColor: "#dc3545",
+          confirmButtonText: "OK",
         });
 
         // Even if there was an error, try to navigate away
@@ -151,9 +152,15 @@ function Navbar({ onSearch }) {
           <div className="flex flex-col md:flex-row items-center justify-between pl-2">
             {/* Logo */}
             <div
-              className="w-1/4 h-12 border border-black/20 mb-3 md:mb-0 cursor-pointer"
+              className="w-auto h-16 mb-3 md:mb-0 cursor-pointer flex items-center px-4"
               onClick={() => navigate("/")}
-            ></div>
+            >
+              <img
+                src={malikaLogo}
+                alt="Malika Logo"
+                className="h-14 w-auto object-contain hover:scale-105 transition-transform duration-200"
+              />
+            </div>
 
             {/* Desktop Search Bar */}
             <div className="hidden md:block w-full max-w-md mx-4">
@@ -189,7 +196,11 @@ function Navbar({ onSearch }) {
                   </button>
                 ) : (
                   <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                    <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <svg
+                      className="w-5 h-5"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                    >
                       <g fill="none" fillRule="evenodd">
                         <path
                           fill="#666666"
@@ -235,7 +246,11 @@ function Navbar({ onSearch }) {
                   </button>
                 ) : (
                   <div className="absolute right-2 top-1/2 -translate-y-1/2 bg-gray-100 w-7 h-7 flex items-center justify-center rounded-full">
-                    <svg className="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <svg
+                      className="w-4 h-4"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                    >
                       <g fill="none" fillRule="evenodd">
                         <path
                           fill="#666666"
@@ -296,7 +311,9 @@ function LoginNavItem({ onClick }) {
         <div className="w-7 h-7 relative mb-1">
           <LoginIcon />
         </div>
-        <div className="text-center text-white text-xs font-poppins font-medium">Login</div>
+        <div className="text-center text-white text-xs font-poppins font-medium">
+          Login
+        </div>
       </div>
     </div>
   );
@@ -305,8 +322,17 @@ function LoginNavItem({ onClick }) {
 // Komponen LoginIcon yang baru
 function LoginIcon() {
   return (
-    <svg className="w-full h-full text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-      <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2m0 4c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6m0 14c-2.03 0-4.43-.82-6.14-2.88a9.95 9.95 0 0 1 12.28 0C16.43 19.18 14.03 20 12 20" stroke-width="0.5" stroke="currentColor" />
+    <svg
+      className="w-full h-full text-white"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+    >
+      <path
+        fill="currentColor"
+        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2m0 4c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6m0 14c-2.03 0-4.43-.82-6.14-2.88a9.95 9.95 0 0 1 12.28 0C16.43 19.18 14.03 20 12 20"
+        stroke-width="0.5"
+        stroke="currentColor"
+      />
     </svg>
   );
 }
@@ -367,8 +393,19 @@ function MenuNavItem({
               className="flex items-center w-full px-5 py-3 font-poppins font-medium text-gray-800 hover:bg-gray-100 hover:rounded-t-xl"
               onClick={onProfile}
             >
-              <svg className="mr-3 text-gray-800" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 32 32">
-                <path fill="currentColor" d="M16 2a7 7 0 1 0 0 14a7 7 0 0 0 0-14m-6 7a6 6 0 1 1 12 0a6 6 0 0 1-12 0m-2.5 9A3.5 3.5 0 0 0 4 21.5v.667C4 24.317 6.766 30 16 30s12-5.684 12-7.833V21.5a3.5 3.5 0 0 0-3.5-3.5zM5 21.5A2.5 2.5 0 0 1 7.5 19h17a2.5 2.5 0 0 1 2.5 2.5v.667C27 23.684 24.765 29 16 29S5 23.684 5 22.167z" stroke-width="2" stroke="currentColor" />
+              <svg
+                className="mr-3 text-gray-800"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 32 32"
+              >
+                <path
+                  fill="currentColor"
+                  d="M16 2a7 7 0 1 0 0 14a7 7 0 0 0 0-14m-6 7a6 6 0 1 1 12 0a6 6 0 0 1-12 0m-2.5 9A3.5 3.5 0 0 0 4 21.5v.667C4 24.317 6.766 30 16 30s12-5.684 12-7.833V21.5a3.5 3.5 0 0 0-3.5-3.5zM5 21.5A2.5 2.5 0 0 1 7.5 19h17a2.5 2.5 0 0 1 2.5 2.5v.667C27 23.684 24.765 29 16 29S5 23.684 5 22.167z"
+                  stroke-width="2"
+                  stroke="currentColor"
+                />
               </svg>
               Profil Saya
             </button>
@@ -379,8 +416,17 @@ function MenuNavItem({
               className="flex items-center w-full px-5 py-3 font-poppins font-medium text-gray-800 hover:bg-gray-100"
               onClick={onHistory}
             >
-              <svg className="mr-3 text-gray-800" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                <path fill="currentColor" d="M21 11.11V5a2 2 0 0 0-2-2h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14a2 2 0 0 0 2 2h6.11c1.26 1.24 2.98 2 4.89 2c3.87 0 7-3.13 7-7c0-1.91-.76-3.63-2-4.89M12 3c.55 0 1 .45 1 1s-.45 1-1 1s-1-.45-1-1s.45-1 1-1M5 19V5h2v2h10V5h2v4.68c-.91-.43-1.92-.68-3-.68H7v2h4.1c-.6.57-1.06 1.25-1.42 2H7v2h2.08c-.05.33-.08.66-.08 1c0 1.08.25 2.09.68 3zm11 2c-2.76 0-5-2.24-5-5s2.24-5 5-5s5 2.24 5 5s-2.24 5-5 5m.5-4.75l2.86 1.69l-.75 1.22L15 17v-5h1.5z" />
+              <svg
+                className="mr-3 text-gray-800"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  fill="currentColor"
+                  d="M21 11.11V5a2 2 0 0 0-2-2h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14a2 2 0 0 0 2 2h6.11c1.26 1.24 2.98 2 4.89 2c3.87 0 7-3.13 7-7c0-1.91-.76-3.63-2-4.89M12 3c.55 0 1 .45 1 1s-.45 1-1 1s-1-.45-1-1s.45-1 1-1M5 19V5h2v2h10V5h2v4.68c-.91-.43-1.92-.68-3-.68H7v2h4.1c-.6.57-1.06 1.25-1.42 2H7v2h2.08c-.05.33-.08.66-.08 1c0 1.08.25 2.09.68 3zm11 2c-2.76 0-5-2.24-5-5s2.24-5 5-5s5 2.24 5 5s-2.24 5-5 5m.5-4.75l2.86 1.69l-.75 1.22L15 17v-5h1.5z"
+                />
               </svg>
               Riwayat Pesanan
             </button>
@@ -391,8 +437,21 @@ function MenuNavItem({
               className="flex items-center w-full px-5 py-3 font-poppins font-medium text-red-600 hover:bg-red-100 hover:rounded-b-xl"
               onClick={onLogout}
             >
-              <svg className="ml-0.25 mr-2.75 text-red-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 512 512">
-                <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="40" d="M304 336v40a40 40 0 0 1-40 40H104a40 40 0 0 1-40-40V136a40 40 0 0 1 40-40h152c22.09 0 48 17.91 48 40v40m64 160l80-80l-80-80m-192 80h256" />
+              <svg
+                className="ml-0.25 mr-2.75 text-red-500"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 512 512"
+              >
+                <path
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="40"
+                  d="M304 336v40a40 40 0 0 1-40 40H104a40 40 0 0 1-40-40V136a40 40 0 0 1 40-40h152c22.09 0 48 17.91 48 40v40m64 160l80-80l-80-80m-192 80h256"
+                />
               </svg>
               Keluar
             </button>
