@@ -1,9 +1,15 @@
+import malikaLogo from "../../../assets/malika.svg"; // Add this import
+
 function CartHeader({ onBack }) {
   return (
     <div className="w-full h-16 bg-green-700 rounded-bl-lg rounded-br-lg outline outline-1 outline-offset-[-1px] outline-zinc-300">
-      {/* Logo placeholder */}
-      <div className="w-32 h-10 left-4 top-3 absolute border border-black/20 flex items-center justify-center text-white font-semibold">
-        LOGO
+      {/* Logo - Updated to use actual logo */}
+      <div className="w-auto h-10 left-4 top-3 absolute flex items-center">
+        <img
+          src={malikaLogo}
+          alt="Malika Logo"
+          className="h-8 w-auto object-contain"
+        />
       </div>
 
       {/* Back button with proper arrow icon */}

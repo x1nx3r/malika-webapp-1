@@ -1,12 +1,16 @@
+import malikaLogo from "../../../assets/malika.svg"; // Add this import
+
 export default function CheckoutHeader({ onCancel }) {
   return (
     <header className="bg-green-700 py-4 px-5 rounded-b-lg shadow-md relative">
       <div className="flex items-center justify-between">
-        {/* Logo placeholder with text */}
-        <div className="w-32 h-10 border border-white/30 rounded-md bg-green-800/30 flex items-center justify-center">
-          <span className="text-white font-semibold tracking-wider text-sm">
-            MALIKA
-          </span>
+        {/* Logo - Updated to use actual logo */}
+        <div className="w-auto h-10 flex items-center">
+          <img
+            src={malikaLogo}
+            alt="Malika Logo"
+            className="h-8 w-auto object-contain"
+          />
         </div>
 
         {/* Title with shopping bag icon */}
