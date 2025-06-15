@@ -21,8 +21,8 @@ function ProductSection({
   }
 
   return (
-    <section className="my-8" id={title.toLowerCase().replace(/\s+/g, "-")}>
-      <h2 className="text-xl sm:text-2xl lg:text-4xl font-bold mb-4 sm:mb-6">
+    <section className="my-8 pt-4" id={title.toLowerCase().replace(/\s+/g, "-")}>
+      <h2 className="text-xl sm:text-2xl lg:text-3xl font-poppins font-bold mb-4">
         {title}
       </h2>
 
