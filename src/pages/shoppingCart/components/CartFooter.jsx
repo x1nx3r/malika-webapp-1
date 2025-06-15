@@ -1,4 +1,4 @@
-function CartFooter({ totalItems, totalPrice, onCheckout }) {
+function CartFooter({ totalPrice, onCheckout }) {
   return (
     <div className="fixed bottom-4 left-0 right-0 flex justify-between gap-10 px-4 max-w-3xl mx-auto">
       <div className="w-1/2 h-16 flex items-center justify-center rounded-xl border-2 border-orange-400 hover:border-orange-700 transition-all duration-200 ease-in">
