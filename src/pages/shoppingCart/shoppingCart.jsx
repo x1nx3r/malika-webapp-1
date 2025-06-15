@@ -108,7 +108,7 @@ function ShoppingCart() {
   }
 
   return (
-    <div className="w-full min-h-screen bg-white shadow-lg overflow-hidden">
+    <div className="w-full min-h-screen overflow-hidden px-20">
       <CartHeader onBack={() => navigate("/")} />
 
       {error && (
@@ -117,7 +117,7 @@ function ShoppingCart() {
         </div>
       )}
 
-      <div className="max-w-3xl mx-auto mt-8 border-t border-b border-slate-950/30 py-4">
+      <div className="max-w-5xl mx-auto mt-16">
         {cartItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8">
             <div className="text-xl text-gray-600 mb-4">Your cart is empty</div>
