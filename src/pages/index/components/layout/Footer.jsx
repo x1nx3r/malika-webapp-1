@@ -62,12 +62,12 @@ function Footer() {
 
   return (
     <footer className="bg-[#D9D9D9]">
-      <div className="container mx-auto px-4 py-6 sm:py-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="container mx-auto px-16 py-6 sm:py-12 cursor-default">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
           {/* Company Info */}
           <div>
-            <div className="h-20 border border-black/20 mb-3"></div>
-            <p className="text-sm text-[#0E0E0E]">
+            <div className="w-[21.188rem] h-20 border border-black/20 mb-3"></div>
+            <p className="text-sm text-gray-800 font-poppins">
               Usaha Mikro, Kecil, dan Menengah (UMKM)
               <br />
               di Kota Surabaya
@@ -76,13 +76,13 @@ function Footer() {
 
           {/* Contact Section */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">
+            <h3 className="text-lg font-poppins font-semibold mb-2">
               Sampaikan tawaran Anda kepada kami
             </h3>
 
             <button
               onClick={handleWhatsAppClick}
-              className="w-full sm:w-auto px-4 py-3 bg-[#FC8A06] rounded-full flex items-center justify-center hover:bg-[#e67a05] transition-colors"
+              className="w-full sm:w-auto px-6 py-2 bg-[#FC8A06] rounded-full flex items-center justify-center hover:bg-[#e67a05] cursor-pointer transition-all duration-200 ease-in"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -96,21 +96,21 @@ function Footer() {
                   d="M16.8 5.7C14.4 2 9.5.9 5.7 3.2C2 5.5.8 10.5 3.2 14.2l.2.3l-.8 3l3-.8l.3.2c1.3.7 2.7 1.1 4.1 1.1c1.5 0 3-.4 4.3-1.2c3.7-2.4 4.8-7.3 2.5-11.1m-2.1 7.7c-.4.6-.9 1-1.6 1.1c-.4 0-.9.2-2.9-.6c-1.7-.8-3.1-2.1-4.1-3.6c-.6-.7-.9-1.6-1-2.5c0-.8.3-1.5.8-2q.3-.3.6-.3H7c.2 0 .4 0 .5.4c.2.5.7 1.7.7 1.8c.1.1.1.3 0 .4c.1.2 0 .4-.1.5s-.2.3-.3.4c-.2.1-.3.3-.2.5c.4.6.9 1.2 1.4 1.7c.6.5 1.2.9 1.9 1.2c.2.1.4.1.5-.1s.6-.7.8-.9s.3-.2.5-.1l1.6.8c.2.1.4.2.5.3c.1.3.1.7-.1 1"
                 />
               </svg>
-              <span className="text-white text-lg font-semibold">
+              <span className="text-white text-lg font-poppins font-semibold">
                 082257374357
               </span>
             </button>
 
-            <div className="mt-4">
-              <p className="text-base">Lihat juga</p>
+            <div className="mt-8">
+              <p className="text-base font-poppins">Lihat juga</p>
               <button
                 onClick={handleInstagramClick}
-                className="mt-1 hover:scale-105 transition-transform"
+                className="mt-1 hover:scale-110 transition-transform cursor-pointer duration-200 ease-in"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  width="36"
-                  height="36"
+                  width="42"
+                  height="42"
                   viewBox="0 0 448 512"
                 >
                   <path
@@ -126,13 +126,13 @@ function Footer() {
           <div className="hidden sm:grid sm:grid-cols-2 gap-6">
             {/* Our Offers */}
             <div>
-              <h3 className="text-lg font-semibold mb-3">Tawaran Kami</h3>
+              <h3 className="text-lg font-poppins font-semibold mb-3">Tawaran Kami</h3>
               <div className="flex flex-col space-y-2">
                 {offerLinks.map((link) => (
                   <button
                     key={link.name}
                     onClick={() => handleOfferClick(link)}
-                    className="text-left text-base underline hover:text-[#FC8A06] transition-colors"
+                    className="text-left text-base font-poppins underline cursor-pointer hover:text-orange-600 transition-all duration-200 ease-out"
                   >
                     {link.name}
                   </button>
@@ -142,13 +142,13 @@ function Footer() {
 
             {/* Other Links */}
             <div>
-              <h3 className="text-lg font-semibold mb-3">Lainnya</h3>
+              <h3 className="text-lg font-poppins font-semibold mb-3">Lainnya</h3>
               <div className="flex flex-col space-y-2">
                 {otherLinks.map((link) => (
                   <button
                     key={link.name}
                     onClick={() => handleNavigation(link.path)}
-                    className="text-left text-base underline hover:text-[#FC8A06] transition-colors"
+                    className="text-left text-base font-poppins underline cursor-pointer hover:text-orange-600 transition-all duration-200 ease-out"
                   >
                     {link.name}
                   </button>
@@ -160,8 +160,8 @@ function Footer() {
       </div>
 
       {/* Copyright Bar */}
-      <div className="bg-[#03081F] py-3 text-center">
-        <p className="text-sm text-[#F0F0F0]">
+      <div className="bg-[#03081F] py-4 text-center">
+        <p className="text-sm text-[#F0F0F0] font-poppins font-light">
           Kedai Malika Copyright 2025, All Rights Reserved.
         </p>
       </div>
