@@ -100,7 +100,7 @@ export default function OrderCard({
               <ul className="text-lg">
                 {order.items.map((item, i) => (
                   <li key={i}>
-                    {item.quantity} x Rp. {item.price.toLocaleString()}
+                    {item.quantity} x Rp{item.price.toLocaleString('id-ID')}
                   </li>
                 ))}
               </ul>

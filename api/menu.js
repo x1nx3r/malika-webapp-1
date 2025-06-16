@@ -29,7 +29,7 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
     "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS",
+    "GET, POST, PUT, DELETE, OPTIONS, PATCH",
   );
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
@@ -38,13 +38,74 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  // Authentication check
+  // GET - Fetch all menu items (PUBLIC ACCESS - tidak perlu login)
+  if (req.method === "GET") {
+    try {
+      console.log("Fetching menu items (public access)...");
+
+      // Check if request wants to show archived items (only for authenticated requests)
+      const showAll = req.query.showAll === "true";
+      
+      // Check if user is authenticated (optional for GET)
+      const cookie = req.headers.cookie || "";
+      const tokenMatch = cookie.match(/firebaseToken=([^;]+)/);
+      let isAuthenticated = false;
+      
+      if (tokenMatch) {
+        try {
+          await admin.auth().verifyIdToken(tokenMatch[1]);
+          isAuthenticated = true;
+          console.log("GET request with authentication");
+        } catch (error) {
+          console.log("GET request without valid authentication, proceeding as public");
+        }
+      }
+
+      let query = menuCollection;
+      
+      // Only show archived items if user is authenticated AND specifically requests it
+      if (!showAll || !isAuthenticated) {
+        query = query.where("isArchived", "!=", true);
+      }
+
+      const snapshot = await query.get();
+      const menus = [];
+
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        menus.push({
+          id: doc.id,
+          name: data.name,
+          category: data.category,
+          price: data.price,
+          kemasan: data.kemasan || "-",
+          description: data.description || "",
+          imageUrl: data.imageUrl || "",
+          createdAt: data.createdAt ? data.createdAt.toDate() : new Date(),
+          updatedAt: data.updatedAt ? data.updatedAt.toDate() : new Date(),
+          isArchived: data.isArchived || false,
+          amount: data.amount || "-",
+        });
+      });
+
+      console.log(`Successfully retrieved ${menus.length} menu items (${isAuthenticated ? 'authenticated' : 'public'} access)`);
+      return res.status(200).json(menus);
+    } catch (error) {
+      console.error("Error getting menus:", error);
+      return res.status(500).json({
+        error: "Failed to get menus",
+        details: error.message,
+      });
+    }
+  }
+
+  // Untuk method selain GET, tetap perlu autentikasi
   const cookie = req.headers.cookie || "";
   const tokenMatch = cookie.match(/firebaseToken=([^;]+)/);
 
   if (!tokenMatch) {
-    console.log("No token found in cookie");
-    return res.status(401).json({ error: "Unauthorized" });
+    console.log("No token found in cookie for protected endpoint");
+    return res.status(401).json({ error: "Unauthorized - Authentication required" });
   }
 
   try {
@@ -53,51 +114,8 @@ export default async function handler(req, res) {
     const userId = decodedToken.uid;
     console.log(`Authenticated user: ${userId}`);
 
-    // GET - Fetch all menu items
-    if (req.method === "GET") {
-      try {
-        console.log("Fetching menu items...");
-
-        const showAll = req.query.showAll === "true";
-        let query = menuCollection;
-        
-        if (!showAll) {
-          query = query.where("isArchived", "!=", true);
-        }
-
-        const snapshot = await query.get();
-        const menus = [];
-
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          menus.push({
-            id: doc.id,
-            name: data.name,
-            category: data.category,
-            price: data.price,
-            kemasan: data.kemasan || "-",
-            description: data.description || "",
-            imageUrl: data.imageUrl || "",
-            createdAt: data.createdAt ? data.createdAt.toDate() : new Date(),
-            updatedAt: data.updatedAt ? data.updatedAt.toDate() : new Date(),
-            isArchived: data.isArchived || false,
-            amount: data.amount || "-",
-          });
-        });
-
-        console.log(`Successfully retrieved ${menus.length} menu items`);
-        return res.status(200).json(menus);
-      } catch (error) {
-        console.error("Error getting menus:", error);
-        return res.status(500).json({
-          error: "Failed to get menus",
-          details: error.message,
-        });
-      }
-    }
-
     // POST - Add new menu item
-    else if (req.method === "POST") {
+    if (req.method === "POST") {
       console.log("Creating new menu item...");
       const { name, category, price, kemasan, description, amount, imageUrl, isArchived } =
         req.body;
@@ -263,7 +281,7 @@ export default async function handler(req, res) {
 
     // Unsupported HTTP method
     else {
-      res.setHeader("Allow", ["GET", "POST", "PUT", "DELETE"]);
+      res.setHeader("Allow", ["GET", "POST", "PUT", "DELETE", "PATCH"]);
       return res.status(405).json({ error: "Method not allowed" });
     }
   } catch (error) {

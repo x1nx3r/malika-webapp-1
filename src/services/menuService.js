@@ -1,15 +1,19 @@
 import axios from "axios";
 
-export const getMenuData = async (token) => {
+export const getMenuData = async (token = null) => {
   try {
-    // Instead of setting as Authorization header,
-    // we need to set the cookie in the request
-    const response = await axios.get("/api/menu", {
-      withCredentials: true, // Important for sending cookies
-      headers: {
-        Cookie: `firebaseToken=${token}`, // This matches what the API expects
-      },
-    });
+    const config = {
+      withCredentials: true,
+    };
+
+    // Hanya tambahkan header Cookie jika token tersedia (untuk user yang login)
+    if (token) {
+      config.headers = {
+        Cookie: `firebaseToken=${token}`,
+      };
+    }
+
+    const response = await axios.get("/api/menu", config);
 
     return response.data.map((item) => ({
       id: item.id,
@@ -20,6 +24,7 @@ export const getMenuData = async (token) => {
       description: item.description || "",
       imageUrl: item.imageUrl || "",
       amount: item.amount || "-",
+      isArchived: item.isArchived || false,
     }));
   } catch (error) {
     console.error("Error fetching menu:", error);

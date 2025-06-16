@@ -26,6 +26,8 @@ export default function AdminPenjualan() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [displayedOrders, setDisplayedOrders] = useState([]);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [shouldShowTransition, setShouldShowTransition] = useState(false);
   
   // State untuk sticky OrderSummary
   const [isSticky, setIsSticky] = useState(false);
@@ -67,11 +69,31 @@ export default function AdminPenjualan() {
 
   // Effect untuk handle scroll dan sticky behavior
   useEffect(() => {
+    let timeoutId;
+    
     const handleScroll = () => {
       if (stickyTriggerRef.current && orderSummaryRef.current) {
         const triggerRect = stickyTriggerRef.current.getBoundingClientRect();
         const shouldBeSticky = triggerRect.top <= 0;
-        setIsSticky(shouldBeSticky);
+        
+        if (shouldBeSticky !== isSticky) {
+          if (shouldBeSticky) {
+            // Dari sticky ke fixed - dengan transisi turun
+            setShouldShowTransition(true);
+            setIsTransitioning(true);
+            
+            // Delay untuk membuat efek turun
+            timeoutId = setTimeout(() => {
+              setIsSticky(true);
+              setIsTransitioning(false);
+            }, 50);
+          } else {
+            // Dari fixed ke sticky - tanpa transisi
+            setIsSticky(false);
+            setShouldShowTransition(false);
+            setIsTransitioning(false);
+          }
+        }
       }
     };
 
@@ -82,8 +104,20 @@ export default function AdminPenjualan() {
     
     return () => {
       window.removeEventListener('scroll', handleScroll);
+      if (timeoutId) clearTimeout(timeoutId);
     };
-  }, []);
+  }, [isSticky]);
+
+  // Cleanup transition state setelah transisi selesai
+  useEffect(() => {
+    if (isSticky && shouldShowTransition) {
+      const timer = setTimeout(() => {
+        setShouldShowTransition(false);
+      }, 0); // Durasi sama dengan CSS transition
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isSticky, shouldShowTransition]);
 
   // Fetch orders from Firestore
   useEffect(() => {
@@ -449,10 +483,14 @@ export default function AdminPenjualan() {
               
               <div 
                 ref={orderSummaryRef}
-                className={`flex-shrink-0 transition-all duration-300 ease-in-out ${
+                className={`flex-shrink-0 transition-all duration-200 ease-in ${
                   isSticky 
-                    ? 'fixed top-6 right-12 z-50' 
-                    : 'relative'
+                    ? `fixed right-12 z-50 ${
+                        shouldShowTransition || isTransitioning 
+                          ? 'top-0' 
+                          : 'top-6'
+                      }` 
+                    : 'relative top-0'
                 }`}
                 style={{
                   width: '386px',

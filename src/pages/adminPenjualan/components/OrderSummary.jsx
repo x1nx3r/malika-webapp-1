@@ -37,7 +37,7 @@ export default function OrderSummary({ order, onStatusChange }) {
 
   const formatCurrency = (value) => {
     if (!value) return '';
-    return `Rp ${Number(value).toLocaleString('id-ID')}`;
+    return `Rp${Number(value).toLocaleString('id-ID')}`;
   };
 
   const parseCurrency = (value) => {
@@ -318,7 +318,8 @@ export default function OrderSummary({ order, onStatusChange }) {
                 </span>
                 <div>
                   <p className="font-semibold text-lg">{item.name}</p>
-                  <p className="font-medium text-green-700 whitespace-nowrap">{`Rp. ${item.price.toLocaleString()}`}</p>
+                  <p className="font-semibold text-sm">{item.kemasan}</p>
+                  <p className="font-medium text-green-700 whitespace-nowrap">{`Rp${item.price.toLocaleString('id-ID')}`}</p>
                 </div>
               </div>
             </div>
@@ -330,13 +331,13 @@ export default function OrderSummary({ order, onStatusChange }) {
       <div className="py-3 px-6 border-t border-gray-200 bg-gray-50">
         <div className="flex justify-between mb-2">
           <p className="font-medium">Sub Total:</p>
-          <p className="font-bold">{`Rp. ${calculateTotal().toLocaleString()}`}</p>
+          <p className="font-bold">{`Rp${calculateTotal().toLocaleString('id-ID')}`}</p>
         </div>
         <div className="flex justify-between">
           <p className="font-medium">Ongkos Kirim:</p>
           <p className="font-bold text-red-500">
             {order.paymentInfo?.shipingCost 
-              ? `Rp. ${order.paymentInfo.shipingCost.toLocaleString()}` 
+              ? `Rp${order.paymentInfo.shipingCost.toLocaleString('id-ID')}` 
               : 'Belum diatur'}
           </p>
         </div>
@@ -383,9 +384,9 @@ export default function OrderSummary({ order, onStatusChange }) {
                 <div className="font-bold">Sudah DP</div>
                 <div className="text-sm">
                   {order.paymentInfo?.downPaymentAmount 
-                    ? `Rp. ${order.paymentInfo.downPaymentAmount.toLocaleString()}` 
+                    ? `Rp${order.paymentInfo.downPaymentAmount.toLocaleString('id-ID')}` 
                     : order.paymentInfo?.downPaymentPercent 
-                      ? `Rp. ${Math.floor((order.paymentInfo.subtotal || 0) * (order.paymentInfo.downPaymentPercent / 100)).toLocaleString()}` 
+                      ? `Rp${Math.floor((order.paymentInfo.subtotal || 0) * (order.paymentInfo.downPaymentPercent / 100)).toLocaleString('id-ID')}` 
                       : 'Belum diatur'}
                 </div>
                 <div className="text-sm">
@@ -415,7 +416,7 @@ export default function OrderSummary({ order, onStatusChange }) {
               <div className="text-center">
                 <div className="font-bold">Lunas</div>
                 <div className="text-sm">
-                  {`Rp. ${calculateRemainingPayment().toLocaleString()}`}
+                  {`Rp${calculateRemainingPayment().toLocaleString('id-ID')}`}
                 </div>
                 <div className="text-sm">
                   {order.paymentInfo?.statusRemainingPayment === 'verified' || hasBeenPaid()
@@ -508,14 +509,6 @@ export default function OrderSummary({ order, onStatusChange }) {
           <div className="bg-white rounded-3xl p-6 w-full max-w-md">
             <div className="flex justify-center items-center mb-4">
               <h3 className="text-xl font-semibold">Catatan Pesanan</h3>
-              {/* <button 
-                onClick={toggleNoteModal}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button> */}
             </div>
             
             {order.deliveryInfo?.notes ? (

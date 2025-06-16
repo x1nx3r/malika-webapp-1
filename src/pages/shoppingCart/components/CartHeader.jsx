@@ -1,58 +1,53 @@
+import malikaLogo from "../../../assets/malika.svg";
+
 function CartHeader({ onBack }) {
   return (
-    <div className="w-full h-16 bg-green-700 rounded-bl-lg rounded-br-lg outline outline-1 outline-offset-[-1px] outline-zinc-300">
-      {/* Logo placeholder */}
-      <div className="w-32 h-10 left-4 top-3 absolute border border-black/20 flex items-center justify-center text-white font-semibold">
-        LOGO
-      </div>
+    <div className="px-30 fixed top-0 left-0 right-0 z-50">
+      <div className="w-full h-20 bg-green-700 py-4 px-4 rounded-b-2xl">
+        <div className="flex items-center justify-between h-full">
+          {/* Logo - Using actual logo with white circular background */}
+          <div className="flex items-center">
+            <div className="relative flex items-center justify-center">
+              {/* White circular background */}
+              <div className="absolute w-14 h-14 bg-white rounded-full shadow-sm"></div>
+              {/* Logo */}
+              <img
+                src={malikaLogo}
+                alt="Malika Logo"
+                className="relative z-10 h-12 w-auto object-contain"
+              />
+            </div>
+          </div>
 
-      {/* Back button with proper arrow icon */}
-      <div className="absolute right-4 top-3">
-        <button
-          onClick={onBack}
-          className="w-28 h-10 bg-white rounded-lg overflow-hidden flex items-center justify-center hover:bg-gray-50 transition-colors"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            className="rotate-90"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+          <h1 className="text-white text-2xl font-semibold font-poppins">
+            Keranjangku
+          </h1>
+
+          <button
+            onClick={onBack}
+            className="w-[130px] h-10 bg-white rounded-lg overflow-hidden flex justify-center items-center hover:bg-gray-100 transition-all duration-200 ease-in"
           >
-            <polyline points="18 15 12 9 6 15"></polyline>
-          </svg>
-          <span className="ml-1 text-stone-950 text-sm font-semibold font-['Poppins']">
-            Kembali
-          </span>
-        </button>
-      </div>
-
-      {/* Title with shopping cart icon */}
-      <div className="absolute left-1/2 top-4 transform -translate-x-1/2 flex items-center">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="white"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="mr-2"
-        >
-          <circle cx="9" cy="21" r="1"></circle>
-          <circle cx="20" cy="21" r="1"></circle>
-          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-        </svg>
-        <h1 className="text-white text-xl font-semibold font-['Poppins']">
-          Keranjangku
-        </h1>
+            <div className="mr-1">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+              >
+                <g fill="none">
+                  <path d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.019-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z" />
+                  <path
+                    fill="currentColor"
+                    d="M3.283 10.94a1.5 1.5 0 0 0 0 2.12l5.656 5.658a1.5 1.5 0 1 0 2.122-2.122L7.965 13.5H19.5a1.5 1.5 0 0 0 0-3H7.965l3.096-3.096a1.5 1.5 0 1 0-2.122-2.121z"
+                  />
+                </g>
+              </svg>
+            </div>
+            <span className="ml-2 mr-1 text-stone-950 text-sm font-semibold font-poppins cursor-pointer">
+              Kembali
+            </span>
+          </button>
+        </div>
       </div>
     </div>
   );

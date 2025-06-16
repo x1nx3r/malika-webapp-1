@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import { useState, useEffect } from "react";
 
 function CategoryButton({ name, isActive, onClick }) {
@@ -6,14 +5,14 @@ function CategoryButton({ name, isActive, onClick }) {
     <button
       onClick={() => onClick(name)}
       className={`
-        flex-shrink-0 rounded-full px-3 py-1.5
+        flex-shrink-0 rounded-full px-14 py-1
         transition-all duration-200 hover:scale-[1.02]
         ${
           isActive
-            ? "bg-black text-white font-semibold"
-            : "text-white hover:bg-white/10 font-medium"
+            ? "bg-black text-white font-bold"
+            : "text-white hover:bg-white/10 font-bold"
         }
-        text-xs sm:text-sm whitespace-nowrap mx-1
+        font-poppins whitespace-nowrap mx-1
       `}
     >
       {name}
@@ -50,9 +49,9 @@ function CategoryNav({
   };
 
   return (
-    <div className="w-full px-2 pb-1 overflow-x-auto no-scrollbar">
+    <div className="w-full py-2 overflow-x-auto no-scrollbar">
       <div className="flex justify-center">
-        <div className="bg-gradient-to-r from-[#FC8A06] to-[#FF6B35] rounded-full flex items-center py-2 px-2 h-12 shadow-md">
+        <div className="bg-gradient-to-r from-[#FC8A06] to-[#FF6B35] rounded-full flex items-center py-2 px-4 h-12">
           {categories.map((category, index) => (
             <CategoryButton
               key={index}
