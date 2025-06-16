@@ -140,7 +140,8 @@ export default function Checkout() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+      <div className="flex items-center justify-center min-h-screen">
+        <CheckoutHeader onCancel={() => navigate("/cart")} />
         <div className="text-center p-8 max-w-md mx-auto">
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-amber-500 mx-auto mb-4"></div>
           <div className="text-xl font-semibold text-gray-700">

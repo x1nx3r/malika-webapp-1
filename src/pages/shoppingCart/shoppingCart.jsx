@@ -104,7 +104,7 @@ function ShoppingCart() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <CartHeader />
+        <CartHeader onBack={() => navigate("/")} />
         <div className="flex flex-col items-center gap-3">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500"></div>
           <div className="text-base font-medium text-gray-700">
