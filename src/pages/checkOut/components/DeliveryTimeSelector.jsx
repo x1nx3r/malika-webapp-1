@@ -5,42 +5,7 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { id } from "date-fns/locale";
 import TextField from "@mui/material/TextField";
-import Paper from "@mui/material/Paper";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-
-// Create a custom theme to match your amber color scheme
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: "#f59e0b", // amber-500
-    },
-    background: {
-      paper: "#ffffff",
-    },
-  },
-  typography: {
-    fontFamily: "'Poppins', sans-serif",
-  },
-  components: {
-    MuiOutlinedInput: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          "&:hover .MuiOutlinedInput-notchedOutline": {
-            borderColor: "#f59e0b",
-          },
-          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-            borderColor: "#f59e0b",
-            borderWidth: 2,
-          },
-        },
-      },
-    },
-  },
-});
 
 export default function DeliveryTimeSelector({
   selectedDate,
@@ -82,24 +47,16 @@ export default function DeliveryTimeSelector({
   }, [selectedDate, selectedTime]);
 
   return (
-    <ThemeProvider theme={theme}>
-      <Paper
-        elevation={0}
-        sx={{ p: 2, border: "1px solid #e5e7eb", borderRadius: 2 }}
-      >
-        <Box sx={{ mb: 2, display: "flex", alignItems: "center" }}>
-          <CalendarTodayIcon sx={{ color: "#f59e0b", mr: 1, fontSize: 20 }} />
-          <Typography
-            variant="subtitle1"
-            sx={{ fontWeight: 500, color: "#374151" }}
-          >
-            Waktu Pengiriman
-          </Typography>
-        </Box>
+    <div className="border-b border-gray-200 px-6 py-4">
+      <div className="flex items-center mb-2">
+        <h2 className="text-gray-800 text-xl font-poppins font-semibold">
+          Waktu Pengiriman:
+        </h2>
+      </div>
 
+      <div className="relative">
         <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={id}>
           <DateTimePicker
-            label="Tanggal dan Waktu"
             value={dateTimeValue}
             onChange={handleDateTimeChange}
             renderInput={(params) => (
@@ -122,34 +79,29 @@ export default function DeliveryTimeSelector({
             ampm={false}
             views={["year", "month", "day", "hours", "minutes"]}
             inputFormat="EEEE, d MMMM yyyy HH:mm"
+            className="w-full"
           />
         </LocalizationProvider>
 
-        <Box sx={{ mt: 1.5, display: "flex", alignItems: "center" }}>
-          <Typography
-            variant="caption"
-            sx={{ color: "#6b7280", display: "flex", alignItems: "center" }}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              style={{ marginRight: 4 }}
-            >
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="8" x2="12" y2="12"></line>
-              <line x1="12" y1="16" x2="12.01" y2="16"></line>
-            </svg>
-            Waktu pengiriman dalam format 24 jam
-          </Typography>
-        </Box>
-      </Paper>
-    </ThemeProvider>
+        <p className="font-poppins text-xs text-gray-600 mt-2 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mr-1" viewBox="0 0 24 24">
+            <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+              <path stroke-dasharray="64" stroke-dashoffset="64" d="M12 3c4.97 0 9 4.03 9 9c0 4.97 -4.03 9 -9 9c-4.97 0 -9 -4.03 -9 -9c0 -4.97 4.03 -9 9 -9Z">
+                <animate fill="freeze" attributeName="stroke-dashoffset" dur="0.6s" values="64;0" />
+              </path>
+              <path stroke-dasharray="8" stroke-dashoffset="8" d="M12 7v6">
+                <animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="8;0" />
+                <animate attributeName="stroke-width" begin="1.8s" dur="3s" keyTimes="0;0.1;0.2;0.3;1" repeatCount="indefinite" values="2;3;3;2;2" />
+              </path>
+              <path stroke-dasharray="2" stroke-dashoffset="2" d="M12 17v0.01">
+                <animate fill="freeze" attributeName="stroke-dashoffset" begin="0.8s" dur="0.2s" values="2;0" />
+                <animate attributeName="stroke-width" begin="2.1s" dur="3s" keyTimes="0;0.1;0.2;0.3;1" repeatCount="indefinite" values="2;3;3;2;2" />
+              </path>
+            </g>
+          </svg>
+          Waktu pengiriman dalam format 24 jam
+        </p>
+      </div>
+    </div>
   );
 }

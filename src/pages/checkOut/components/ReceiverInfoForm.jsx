@@ -57,52 +57,24 @@ export default function ReceiverInfoForm({ receiverInfo, setReceiverInfo }) {
   };
 
   return (
-    <div className="mb-5 pb-5 border-b border-gray-200 bg-white rounded-lg p-4 shadow-sm">
+    <div className="mb-5 pb-5 border-b border-gray-200 px-6 py-6">
       <div className="flex items-center mb-4">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5 text-amber-500 mr-2"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-          <circle cx="12" cy="7" r="4"></circle>
-        </svg>
-        <h2 className="text-gray-800 text-xl font-semibold font-poppins">
+        <h2 className="text-gray-800 text-2xl font-poppins font-semibold">
           Informasi Penerima
         </h2>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Name field */}
         <div>
           <label
-            className="block text-gray-700 text-sm font-medium font-poppins mb-1"
+            className="block text-gray-800 text-sm font-medium font-poppins pl-4 mb-1"
             htmlFor="name"
           >
-            Nama Penerima <span className="text-red-500">*</span>
+            <span className="text-red-500">*</span>Nama Penerima:
           </label>
           <div className="flex">
             <div className="relative flex-grow">
-              <div className="absolute inset-y-0 left-0 pl-3 pb-2 flex items-center pointer-events-none">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 text-gray-500"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-              </div>
               <input
                 type="text"
                 id="name"
@@ -110,11 +82,11 @@ export default function ReceiverInfoForm({ receiverInfo, setReceiverInfo }) {
                 value={receiverInfo.name}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                className={`w-full h-10 rounded-lg pl-10 pr-3 py-2 text-sm font-poppins transition-colors
+                className={`w-full h-10 rounded-lg px-3 py-2 text-sm font-poppins border border-gray-300 focus:outline-none focus:border-gray-400 transition-all duration-150 ease-in
                   ${
                     isFieldEmpty("name")
-                      ? "border-red-500 bg-red-50 focus:ring-red-500"
-                      : "border-gray-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-500 focus:ring-opacity-50"
+                      ? "border-red-500 focus:border-orange-400"
+                      : "border-gray-300"
                   }`}
                 placeholder="Masukkan nama penerima"
                 aria-required="true"
@@ -123,41 +95,27 @@ export default function ReceiverInfoForm({ receiverInfo, setReceiverInfo }) {
             <button
               type="button"
               onClick={useAccountName}
-              className="ml-2 bg-gray-100 border border-gray-300 hover:bg-gray-200 px-3 py-2 rounded-lg text-center text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 flex items-center"
+              className="ml-2 bg-gray-200 hover:bg-gray-300 px-3 py-2 rounded-lg text-center text-sm font-poppins font-semibold cursor-pointer focus:outline-none transition-all duration-150 ease-in"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-3.5 w-3.5 mr-1"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                <circle cx="8.5" cy="7" r="4"></circle>
-                <line x1="20" y1="8" x2="20" y2="14"></line>
-                <line x1="23" y1="11" x2="17" y2="11"></line>
-              </svg>
-              Gunakan Akun
+              Nama Akun
             </button>
           </div>
           {isFieldEmpty("name") && (
-            <p className="text-red-500 text-xs mt-1 flex items-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-3 w-3 mr-1"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="8" x2="12" y2="12"></line>
-                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            <p className="font-poppins text-red-500 text-xs mt-1 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mr-1" viewBox="0 0 24 24">
+                <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                  <path stroke-dasharray="64" stroke-dashoffset="64" d="M12 3c4.97 0 9 4.03 9 9c0 4.97 -4.03 9 -9 9c-4.97 0 -9 -4.03 -9 -9c0 -4.97 4.03 -9 9 -9Z">
+                    <animate fill="freeze" attributeName="stroke-dashoffset" dur="0.6s" values="64;0" />
+                  </path>
+                  <path stroke-dasharray="8" stroke-dashoffset="8" d="M12 7v6">
+                    <animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="8;0" />
+                    <animate attributeName="stroke-width" begin="1.8s" dur="3s" keyTimes="0;0.1;0.2;0.3;1" repeatCount="indefinite" values="2;3;3;2;2" />
+                  </path>
+                  <path stroke-dasharray="2" stroke-dashoffset="2" d="M12 17v0.01">
+                    <animate fill="freeze" attributeName="stroke-dashoffset" begin="0.8s" dur="0.2s" values="2;0" />
+                    <animate attributeName="stroke-width" begin="2.1s" dur="3s" keyTimes="0;0.1;0.2;0.3;1" repeatCount="indefinite" values="2;3;3;2;2" />
+                  </path>
+                </g>
               </svg>
               Nama penerima harus diisi
             </p>
@@ -167,27 +125,13 @@ export default function ReceiverInfoForm({ receiverInfo, setReceiverInfo }) {
         {/* Phone field */}
         <div>
           <label
-            className="block text-gray-700 text-sm font-medium font-poppins mb-1"
+            className="block text-gray-800 text-sm font-medium font-poppins mb-1"
             htmlFor="phone"
           >
-            No HP Penerima <span className="text-red-500">*</span>
+            <span className="text-red-500">*</span>No HP Penerima:
           </label>
           <div className="flex">
             <div className="relative flex-grow">
-              <div className="absolute inset-y-0 left-0 pl-3 pb-2 flex items-center pointer-events-none">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 text-gray-500"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                </svg>
-              </div>
               <input
                 type="tel"
                 id="phone"
@@ -195,11 +139,11 @@ export default function ReceiverInfoForm({ receiverInfo, setReceiverInfo }) {
                 value={receiverInfo.phone}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                className={`w-full h-10 rounded-lg pl-10 pr-3 py-2 text-sm font-poppins transition-colors
+                className={`w-full h-10 rounded-lg px-3 py-2 text-sm font-poppins border border-gray-300 focus:outline-none focus:border-gray-400 transition-all duration-150 ease-in
                   ${
                     isFieldEmpty("phone") || !isPhoneValid()
-                      ? "border-red-500 bg-red-50 focus:ring-red-500"
-                      : "border-gray-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-500 focus:ring-opacity-50"
+                      ? "border-red-500 focus:border-orange-400"
+                      : "border-gray-300"
                   }`}
                 placeholder="contoh: 0812345xxxx"
                 aria-required="true"
@@ -208,80 +152,70 @@ export default function ReceiverInfoForm({ receiverInfo, setReceiverInfo }) {
             <button
               type="button"
               onClick={useAccountPhone}
-              className="ml-2 bg-gray-100 border border-gray-300 hover:bg-gray-200 px-3 py-2 rounded-lg text-center text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 flex items-center"
+              className="ml-2 bg-gray-200 hover:bg-gray-300 px-3 py-2 rounded-lg text-center text-sm font-poppins font-semibold cursor-pointer focus:outline-none transition-all duration-150 ease-in"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-3.5 w-3.5 mr-1"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M20 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-              </svg>
               No. HP Akun
             </button>
           </div>
           {isFieldEmpty("phone") && (
-            <p className="text-red-500 text-xs mt-1 flex items-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-3 w-3 mr-1"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="8" x2="12" y2="12"></line>
-                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            <p className="font-poppins text-red-500 text-xs mt-1 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mr-1" viewBox="0 0 24 24">
+                <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                  <path stroke-dasharray="64" stroke-dashoffset="64" d="M12 3c4.97 0 9 4.03 9 9c0 4.97 -4.03 9 -9 9c-4.97 0 -9 -4.03 -9 -9c0 -4.97 4.03 -9 9 -9Z">
+                    <animate fill="freeze" attributeName="stroke-dashoffset" dur="0.6s" values="64;0" />
+                  </path>
+                  <path stroke-dasharray="8" stroke-dashoffset="8" d="M12 7v6">
+                    <animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="8;0" />
+                    <animate attributeName="stroke-width" begin="1.8s" dur="3s" keyTimes="0;0.1;0.2;0.3;1" repeatCount="indefinite" values="2;3;3;2;2" />
+                  </path>
+                  <path stroke-dasharray="2" stroke-dashoffset="2" d="M12 17v0.01">
+                    <animate fill="freeze" attributeName="stroke-dashoffset" begin="0.8s" dur="0.2s" values="2;0" />
+                    <animate attributeName="stroke-width" begin="2.1s" dur="3s" keyTimes="0;0.1;0.2;0.3;1" repeatCount="indefinite" values="2;3;3;2;2" />
+                  </path>
+                </g>
               </svg>
               Nomor telepon harus diisi
             </p>
           )}
           {!isFieldEmpty("phone") && !isPhoneValid() && (
-            <p className="text-red-500 text-xs mt-1 flex items-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-3 w-3 mr-1"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="8" x2="12" y2="12"></line>
-                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            <p className="font-poppins text-red-500 text-xs mt-1 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mr-1" viewBox="0 0 24 24">
+                <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                  <path stroke-dasharray="64" stroke-dashoffset="64" d="M12 3c4.97 0 9 4.03 9 9c0 4.97 -4.03 9 -9 9c-4.97 0 -9 -4.03 -9 -9c0 -4.97 4.03 -9 9 -9Z">
+                    <animate fill="freeze" attributeName="stroke-dashoffset" dur="0.6s" values="64;0" />
+                  </path>
+                  <path stroke-dasharray="8" stroke-dashoffset="8" d="M12 7v6">
+                    <animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="8;0" />
+                    <animate attributeName="stroke-width" begin="1.8s" dur="3s" keyTimes="0;0.1;0.2;0.3;1" repeatCount="indefinite" values="2;3;3;2;2" />
+                  </path>
+                  <path stroke-dasharray="2" stroke-dashoffset="2" d="M12 17v0.01">
+                    <animate fill="freeze" attributeName="stroke-dashoffset" begin="0.8s" dur="0.2s" values="2;0" />
+                    <animate attributeName="stroke-width" begin="2.1s" dur="3s" keyTimes="0;0.1;0.2;0.3;1" repeatCount="indefinite" values="2;3;3;2;2" />
+                  </path>
+                </g>
               </svg>
-              Format nomor telepon tidak valid
+              Format No HP tidak valid
             </p>
           )}
         </div>
       </div>
 
       {/* Address field */}
-      <div className="mt-4">
+      <div className="mt-10">
         <div className="flex items-center justify-between mb-1">
           <label
-            className="text-gray-700 text-sm font-medium font-poppins"
+            className="text-gray-800 text-sm font-medium font-poppins"
             htmlFor="address"
           >
-            Alamat Penerima <span className="text-red-500">*</span>
+            <span className="text-red-500">*</span>Alamat Penerima:
           </label>
           <button
             type="button"
-            className="bg-gray-100 border border-gray-300 hover:bg-gray-200 px-3 py-1 rounded-lg text-center text-xs font-medium transition-colors flex items-center focus:outline-none focus:ring-2 focus:ring-amber-500"
+            className="flex items-center justify-center bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded-md text-center text-sm font-poppins font-semibold cursor-pointer focus:outline-none transition-all duration-150"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-3.5 w-3.5 mr-1"
+              className="h-3.5 w-3.5 mr-2"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -295,74 +229,61 @@ export default function ReceiverInfoForm({ receiverInfo, setReceiverInfo }) {
             Pilih Alamat Tersimpan
           </button>
         </div>
-        <div className="relative">
-          <div className="absolute top-3 left-3 text-gray-500">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-              <circle cx="12" cy="10" r="3"></circle>
-            </svg>
-          </div>
+        <div className="relative flex-grow mt-2">
           <textarea
             id="address"
             name="address"
             value={receiverInfo.address}
             onChange={handleChange}
             onBlur={handleBlur}
-            className={`w-full min-h-[5rem] rounded-lg pl-10 pr-3 py-2 text-sm font-poppins resize-y transition-colors
+            className={`w-full min-h-[6rem] rounded-lg px-3 py-2 text-sm font-poppins resize-y border border-gray-300 focus:outline-none focus:border-gray-400 transition-all duration-150 ease-in
               ${
                 isFieldEmpty("address")
-                  ? "border-red-500 bg-red-50 focus:ring-red-500"
-                  : "border-gray-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-500 focus:ring-opacity-50"
+                  ? "border-red-500 focus:border-orange-400"
+                  : "border-gray-300"
               }`}
             placeholder="Masukkan alamat lengkap penerima (jalan, nomor rumah, RT/RW, kelurahan, kecamatan, kota/kabupaten, kode pos)"
             aria-required="true"
           ></textarea>
           {isFieldEmpty("address") && (
-            <p className="text-red-500 text-xs mt-1 flex items-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-3 w-3 mr-1"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="8" x2="12" y2="12"></line>
-                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            <p className="font-poppins text-red-500 text-xs mt-1 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mr-1" viewBox="0 0 24 24">
+                <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                  <path stroke-dasharray="64" stroke-dashoffset="64" d="M12 3c4.97 0 9 4.03 9 9c0 4.97 -4.03 9 -9 9c-4.97 0 -9 -4.03 -9 -9c0 -4.97 4.03 -9 9 -9Z">
+                    <animate fill="freeze" attributeName="stroke-dashoffset" dur="0.6s" values="64;0" />
+                  </path>
+                  <path stroke-dasharray="8" stroke-dashoffset="8" d="M12 7v6">
+                    <animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="8;0" />
+                    <animate attributeName="stroke-width" begin="1.8s" dur="3s" keyTimes="0;0.1;0.2;0.3;1" repeatCount="indefinite" values="2;3;3;2;2" />
+                  </path>
+                  <path stroke-dasharray="2" stroke-dashoffset="2" d="M12 17v0.01">
+                    <animate fill="freeze" attributeName="stroke-dashoffset" begin="0.8s" dur="0.2s" values="2;0" />
+                    <animate attributeName="stroke-width" begin="2.1s" dur="3s" keyTimes="0;0.1;0.2;0.3;1" repeatCount="indefinite" values="2;3;3;2;2" />
+                  </path>
+                </g>
               </svg>
               Alamat penerima harus diisi
             </p>
           )}
         </div>
-        <p className="text-xs text-gray-500 mt-1.5 flex items-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-3 w-3 mr-1"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="16" x2="12.01" y2="16"></line>
-            <line x1="12" y1="8" x2="12" y2="12"></line>
+        <p className="font-poppins text-xs text-gray-600 mt-2 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mr-1" viewBox="0 0 24 24">
+            <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+              <path stroke-dasharray="64" stroke-dashoffset="64" d="M12 3c4.97 0 9 4.03 9 9c0 4.97 -4.03 9 -9 9c-4.97 0 -9 -4.03 -9 -9c0 -4.97 4.03 -9 9 -9Z">
+                <animate fill="freeze" attributeName="stroke-dashoffset" dur="0.6s" values="64;0" />
+              </path>
+              <path stroke-dasharray="8" stroke-dashoffset="8" d="M12 7v6">
+                <animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="8;0" />
+                <animate attributeName="stroke-width" begin="1.8s" dur="3s" keyTimes="0;0.1;0.2;0.3;1" repeatCount="indefinite" values="2;3;3;2;2" />
+              </path>
+              <path stroke-dasharray="2" stroke-dashoffset="2" d="M12 17v0.01">
+                <animate fill="freeze" attributeName="stroke-dashoffset" begin="0.8s" dur="0.2s" values="2;0" />
+                <animate attributeName="stroke-width" begin="2.1s" dur="3s" keyTimes="0;0.1;0.2;0.3;1" repeatCount="indefinite" values="2;3;3;2;2" />
+              </path>
+            </g>
           </svg>
           Pastikan alamat pengiriman sudah lengkap dan akurat untuk memastikan
-          pesanan sampai tepat waktu
+          kurir tidak kesasar
         </p>
       </div>
     </div>
