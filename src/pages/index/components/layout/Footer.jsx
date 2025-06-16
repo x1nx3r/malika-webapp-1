@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import malikaLogo from "../../../../assets/malika.svg";
 
 function Footer() {
   const navigate = useNavigate();
@@ -63,26 +64,48 @@ function Footer() {
   return (
     <footer className="bg-[#D9D9D9]">
       <div className="container mx-auto px-16 py-6 sm:py-12 cursor-default">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-          {/* Company Info */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Company Info with Logo */}
           <div>
-            <div className="w-[21.188rem] h-20 border border-black/20 mb-3"></div>
-            <p className="text-sm text-gray-800 font-poppins">
+            {/* Logo Container */}
+            <div className="flex items-center mb-4">
+              <div className="relative flex items-center justify-center">
+                {/* White circular background */}
+                <div className="absolute w-16 h-16 bg-white rounded-full shadow-md"></div>
+                {/* Logo */}
+                <img
+                  src={malikaLogo}
+                  alt="Malika Logo"
+                  className="relative z-10 h-14 w-auto object-contain"
+                />
+              </div>
+              <div className="ml-4">
+                <h2 className="text-xl font-poppins font-bold text-gray-800">
+                  Kedai Malika
+                </h2>
+              </div>
+            </div>
+
+            <p className="text-sm text-gray-800 font-poppins leading-relaxed">
               Usaha Mikro, Kecil, dan Menengah (UMKM)
               <br />
               di Kota Surabaya
+            </p>
+
+            <p className="text-xs text-gray-600 font-poppins mt-2">
+              Menyajikan makanan berkualitas dengan cita rasa autentik
             </p>
           </div>
 
           {/* Contact Section */}
           <div>
-            <h3 className="text-lg font-poppins font-semibold mb-2">
+            <h3 className="text-lg font-poppins font-semibold mb-4 text-gray-800">
               Sampaikan tawaran Anda kepada kami
             </h3>
 
             <button
               onClick={handleWhatsAppClick}
-              className="w-full sm:w-auto px-6 py-2 bg-[#FC8A06] rounded-full flex items-center justify-center hover:bg-[#e67a05] cursor-pointer transition-all duration-200 ease-in"
+              className="w-full sm:w-auto px-6 py-3 bg-[#FC8A06] rounded-full flex items-center justify-center hover:bg-[#e67a05] cursor-pointer transition-all duration-200 ease-in shadow-md"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -102,16 +125,19 @@ function Footer() {
             </button>
 
             <div className="mt-8">
-              <p className="text-base font-poppins">Lihat juga</p>
+              <p className="text-base font-poppins text-gray-800 mb-2">
+                Lihat juga
+              </p>
               <button
                 onClick={handleInstagramClick}
-                className="mt-1 hover:scale-110 transition-transform cursor-pointer duration-200 ease-in"
+                className="hover:scale-110 transition-transform cursor-pointer duration-200 ease-in"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="42"
                   height="42"
                   viewBox="0 0 448 512"
+                  className="text-pink-600 hover:text-pink-700"
                 >
                   <path
                     fill="currentColor"
@@ -126,13 +152,15 @@ function Footer() {
           <div className="hidden sm:grid sm:grid-cols-2 gap-6">
             {/* Our Offers */}
             <div>
-              <h3 className="text-lg font-poppins font-semibold mb-3">Tawaran Kami</h3>
+              <h3 className="text-lg font-poppins font-semibold mb-4 text-gray-800">
+                Tawaran Kami
+              </h3>
               <div className="flex flex-col space-y-2">
                 {offerLinks.map((link) => (
                   <button
                     key={link.name}
                     onClick={() => handleOfferClick(link)}
-                    className="text-left text-base font-poppins underline cursor-pointer hover:text-orange-600 transition-all duration-200 ease-out"
+                    className="text-left text-base font-poppins underline cursor-pointer hover:text-orange-600 transition-all duration-200 ease-out text-gray-700"
                   >
                     {link.name}
                   </button>
@@ -142,13 +170,15 @@ function Footer() {
 
             {/* Other Links */}
             <div>
-              <h3 className="text-lg font-poppins font-semibold mb-3">Lainnya</h3>
+              <h3 className="text-lg font-poppins font-semibold mb-4 text-gray-800">
+                Lainnya
+              </h3>
               <div className="flex flex-col space-y-2">
                 {otherLinks.map((link) => (
                   <button
                     key={link.name}
                     onClick={() => handleNavigation(link.path)}
-                    className="text-left text-base font-poppins underline cursor-pointer hover:text-orange-600 transition-all duration-200 ease-out"
+                    className="text-left text-base font-poppins underline cursor-pointer hover:text-orange-600 transition-all duration-200 ease-out text-gray-700"
                   >
                     {link.name}
                   </button>
