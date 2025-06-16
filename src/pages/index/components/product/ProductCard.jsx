@@ -1,23 +1,23 @@
 function ProductCard({ product, onAddToCart, isLoading }) {
   return (
-    <div className="w-full sm:w-80 md:w-full max-w-2xl h-auto md:h-60 bg-white rounded-lg shadow-lg flex flex-col md:flex-row overflow-hidden">
+    <div className="w-full sm:w-80 md:w-full max-w-2xl h-auto md:h-60 p-6 bg-white rounded-2xl flex flex-col md:flex-row drop-shadow hover:drop-shadow-lg overflow-hidden gap-4 transition-all duration-200 ease-in">
       {/* Product Details Section */}
-      <div className="p-3 md:p-4 flex flex-col justify-between flex-1">
+      <div className="flex flex-col justify-between flex-1 cursor-default">
         <div>
           <div className="mb-2">
-            <h3 className="text-gray-900 text-base md:text-lg font-semibold mb-1">
+            <h3 className="text-gray-800 text-lg font-poppins font-semibold mb-0.5 line-clamp-3 text-ellipsis leading-5">
               {product.name}
             </h3>
-            <p className="text-gray-800 text-xs md:text-sm font-medium">
+            <p className="text-gray-800 text-xs md:text-sm font-poppins font-medium">
               Kemasan: {product.kemasan}
             </p>
           </div>
           {/* Description with truncation */}
-          <p className="text-gray-700 text-xs md:text-sm leading-snug line-clamp">
+          <p className="text-gray-800 text-[8px] font-poppins font-light leading-snug line-clamp">
             {product.description}
           </p>
         </div>
-        <div className="text-gray-900 text-base md:text-lg font-bold mt-2 md:mt-0">
+        <div className="text-gray-900 text-base md:text-lg font-poppins font-bold mt-2 md:mt-0">
           Rp{product.price.toLocaleString("id-ID")},-
         </div>
       </div>
@@ -25,7 +25,7 @@ function ProductCard({ product, onAddToCart, isLoading }) {
       {/* Image Section with Add Button */}
       <div className="relative order-first md:order-last">
         <img
-          className="w-full h-36 md:w-48 md:h-48 object-cover md:m-6 md:rounded-lg"
+          className="w-full h-36 md:w-48 md:h-48 object-cover md:rounded-xl"
           src={product.imageUrl}
           alt={product.name}
         />
@@ -34,14 +34,15 @@ function ProductCard({ product, onAddToCart, isLoading }) {
           onClick={() => onAddToCart(product)}
           disabled={isLoading}
           className={`
-            absolute bottom-2 right-2 md:bottom-5 md:right-5
+            absolute bottom-2 right-2 md:bottom-0 md:right-0
             w-10 h-10 md:w-12 md:h-12
             flex items-center justify-center
-            rounded-tl-2xl rounded-br-md
+            rounded-tl-2xl rounded-br-xl
+            cursor-pointer
             ${
               isLoading
                 ? "bg-gray-300 cursor-not-allowed"
-                : "bg-white/80 hover:bg-white hover:shadow-md"
+                : "bg-white/80 hover:bg-white hover:drop-shadow"
             }
             transition-all
           `}

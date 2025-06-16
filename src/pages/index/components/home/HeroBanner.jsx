@@ -1,11 +1,11 @@
 function HeroBanner() {
   return (
     <section className="w-full">
-      <div className="relative rounded-lg overflow-hidden shadow-md">
+      <div className="relative rounded-2xl overflow-hidden shadow-md">
         {/* Background Image with Overlay */}
         <div className="relative">
           <img
-            className="w-full h-[200px] sm:h-[250px] md:h-[320px] lg:h-[400px] object-cover"
+            className="w-full h-[200px] sm:h-[250px] md:h-[320px] lg:h-[360px] object-cover"
             src="https://gevannoyoh.com/thumb-malika/thumb-hero.webp"
             alt="Banner"
           />
@@ -17,15 +17,15 @@ function HeroBanner() {
           {/* Left Content */}
           <div className="flex flex-col justify-between mb-4 md:mb-0 md:max-w-[50%]">
             <div>
-              <div className="text-white text-sm sm:text-base font-medium mb-2">
+              <div className="text-white text-sm sm:text-base font-poppins font-medium mb-4">
                 100% Otentik
               </div>
-              <h1 className="text-white text-xl sm:text-3xl md:text-4xl font-semibold leading-tight mb-1">
+              <h1 className="text-white text-xl sm:text-3xl md:text-4xl font-poppins font-semibold leading-tight mb-1">
                 Lodho Ayam Kampung
                 <br className="hidden sm:block" />
                 Kedai Malika
               </h1>
-              <p className="text-white text-base sm:text-xl font-semibold">
+              <p className="text-white text-base sm:text-xl font-poppins font-medium">
                 khas Trenggalek
               </p>
             </div>
@@ -48,7 +48,7 @@ function HeroBanner() {
           {/* Right Content - Hidden on mobile */}
           <div className="hidden sm:block relative">
             <img
-              className="w-[16rem] h-[10rem] md:w-[20rem] md:h-[12rem] lg:w-[24rem] lg:h-[14rem] rounded-lg object-cover"
+              className="w-[16rem] h-[10rem] md:w-[20rem] md:h-[12rem] lg:w-[605px] lg:h-[290px] rounded-xl object-cover object-bottom"
               src="https://gevannoyoh.com/thumb-malika/thumb-hero.webp"
               alt="Product"
             />
@@ -66,12 +66,12 @@ function ContactButton({ icon, text, link }) {
       href={link}
       target="_blank"
       rel="noopener noreferrer"
-      className="h-10 sm:h-12 flex items-center justify-center rounded-full border border-[#F0F0F0] px-4 hover:bg-white/10 transition-colors"
+      className="h-10 flex items-center justify-center rounded-full border border-[#F0F0F0] px-6 hover:bg-white/10 transition-colors"
     >
       <div className="w-6 h-6 mr-2 flex items-center justify-center">
         {icon}
       </div>
-      <div className="text-white text-sm sm:text-base font-semibold">
+      <div className="text-white text-sm sm:text-base font-poppins font-semibold">
         {text}
       </div>
     </a>
@@ -80,13 +80,13 @@ function ContactButton({ icon, text, link }) {
 
 function RatingBox({ rating }) {
   return (
-    <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 absolute bottom-[-10px] left-[-10px] bg-white rounded-lg flex flex-col items-center justify-center shadow-lg">
-      <div className="text-[#0E0E0E] text-2xl sm:text-3xl md:text-4xl font-medium">
+    <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 absolute bottom-[-10px] left-[-10px] bg-white rounded-xl flex flex-col items-center justify-center">
+      <div className="text-[#0E0E0E] text-2xl sm:text-3xl md:text-[44px] font-poppins font-medium">
         {rating.toFixed(1)}
       </div>
-      <div className="flex mt-1">
+      <div className="flex">
         {[...Array(5)].map((_, index) => (
-          <div key={index} className="text-[#FBBC04] w-3 h-3 sm:w-4 sm:h-4">
+          <div key={index} className="text-[#FBBC04] w-3 h-3 sm:w-5 sm:h-5 -m-0.5">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
